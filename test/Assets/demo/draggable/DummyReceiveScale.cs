@@ -1,6 +1,6 @@
 using UnityEngine;
 using N;
-using N.Input.Draggable;
+using N.Package.Input.Draggable;
 
 public class DummyReceiveScale : MonoBehaviour
 {

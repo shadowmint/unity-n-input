@@ -2,7 +2,7 @@ using N;
 using N.Package.Input;
 using UnityEngine;
 
-namespace N.Input.Draggable
+namespace N.Package.Input.Draggable
 {
     /// Handle draggables on the current scene
     [AddComponentMenu("N/Input/Draggable/Draggable Manager")]

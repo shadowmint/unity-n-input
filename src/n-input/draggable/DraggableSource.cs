@@ -3,7 +3,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace N.Input.Draggable
+namespace N.Package.Input.Draggable
 {
     /// Makes it possible to drag a Draggable from the GameObject
     [AddComponentMenu("N/Input/Draggable/Draggable Source")]
@@ -83,6 +83,12 @@ namespace N.Input.Draggable
             {
                 GameObject.Destroy(cursorInstance);
             }
+        }
+
+        /// Makes sure a manager exists
+        public void Start()
+        {
+            Draggable.RequireManager();
         }
     }
 }

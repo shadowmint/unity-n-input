@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using System;
 
-namespace N.Input.Draggable
+namespace N.Package.Input.Draggable
 {
     /// Use this to run event targets on a DraggableReceiver
     public class ReceiveTarget
@@ -75,6 +75,11 @@ namespace N.Input.Draggable
         public void DefaultLeaveHandler(DraggableSource target)
         {
             throw new Exception("Default handler is for example purposes only.");
+        }
+
+        /// Makes sure an instance exists on start
+        public void Start() {
+            Draggable.RequireManager();
         }
     }
 }
