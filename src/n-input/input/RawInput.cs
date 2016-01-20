@@ -23,45 +23,39 @@ namespace N.Package.Input
 
         /// Add an event listener
         public static void Register(RawInputHandler handler)
-        {
-            Instance.Register(handler);
-        }
+        { Instance.Register(handler); }
 
         /// Remove an event listener
         public static void Remove(RawInputHandler handler)
-        {
-            Instance.Remove(handler);
-        }
+        { Instance.Remove(handler); }
 
         /// Clear all event handlers and listeners
         public static void Clear()
-        {
-            Instance.Clear();
-        }
+        { Instance.Clear(); }
 
         /// Poll all event listeners for input
         public static void Update()
-        {
-            Instance.Update();
-        }
+        { Instance.Update(); }
 
         /// Poll all event listeners for input every frame
         public static void UpdateFrame()
-        {
-            Instance.UpdateFrame();
-        }
+        { Instance.UpdateFrame(); }
 
         /// Attach an event handler
         public static void Event(N.EventHandler handler)
-        {
-            Instance.Event(handler);
-        }
+        { Instance.Event(handler); }
+
+        /// Attach a single event handler
+        public static void ScopedEvent<T>(N.ScopedEventHandler<T> handler) where T : N.Event
+        { Instance.ScopedEvent(handler); }
+
+        /// Remove an event handler
+        public static void Remove(N.EventHandler handler)
+        { Instance.Remove(handler); }
 
         /// Trigger an event from an external event source
         public static void Trigger(N.Event item)
-        {
-            Instance.Trigger(item);
-        }
+        { Instance.Trigger(item); }
     }
 
     /// The low level wrapper around Input to handle various input events
@@ -118,6 +112,18 @@ namespace N.Package.Input
         public void Event(N.EventHandler handler)
         {
             events += handler;
+        }
+
+        /// Remove an event listener
+        public void Remove(N.EventHandler handler)
+        {
+            events.Remove(handler);
+        }
+
+        /// Add a scoped event handler
+        public void ScopedEvent<T>(N.ScopedEventHandler<T> handler) where T : N.Event
+        {
+            new ScopedEvent<T>(events, handler);
         }
 
         /// Trigger an event
