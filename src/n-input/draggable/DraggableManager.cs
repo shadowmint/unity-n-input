@@ -72,27 +72,32 @@ namespace N.Package.Input.Draggable
         /// Enter a Receiver area
         private void EnterReceiver(CursorEnterEvent ev)
         {
-            if (currentDraggable != null)
+            if ((currentDraggable != null) && (ev.target != currentDraggable))
             {
                 if (ev.type == typeof(DraggableReceiver))
                 {
-                    // Save receiver
-                    currentDraggableReceiver = ev.target.GetComponent<DraggableReceiver>();
-                    currentReceiver = ev.target;
-
-                    // Check if valid?
-                    var query = new ReceiveTarget() { source = currentDraggableSource };
-                    currentDraggableReceiver.onCheckDraggable.Invoke(query);
-                    acceptedReceiver = query.accept;
-
-                    // Update
-                    if (acceptedReceiver)
+                    // If we currently have no receiver, save it
+                    // This allows for draggables to overlap and we keep only the matching target
+                    if (currentReceiver == null)
                     {
-                        currentDraggableSource.onDraggableAccepted.Invoke(currentDraggableSource);
-                    }
-                    else
-                    {
-                        currentDraggableSource.onDraggableRejected.Invoke(currentDraggableSource);
+                        // Save receiver
+                        currentDraggableReceiver = ev.target.GetComponent<DraggableReceiver>();
+                        currentReceiver = ev.target;
+
+                        // Check if valid?
+                        var query = new ReceiveTarget() { source = currentDraggableSource };
+                        currentDraggableReceiver.onCheckDraggable.Invoke(query);
+                        acceptedReceiver = query.accept;
+
+                        // Update
+                        if (acceptedReceiver)
+                        {
+                            currentDraggableSource.onDraggableAccepted.Invoke(currentDraggableSource);
+                        }
+                        else
+                        {
+                            currentDraggableSource.onDraggableRejected.Invoke(currentDraggableSource);
+                        }
                     }
                 }
             }
