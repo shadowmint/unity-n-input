@@ -9,6 +9,9 @@ namespace N.Package.Input.Draggable
     [AddComponentMenu("N/Input/Draggable/Draggable Source")]
     public class DraggableSource : MonoBehaviour
     {
+        [Serializable]
+        public class ReadyEvent : UnityEvent<ReceiveTarget> { }
+
         [Tooltip("When dragging, create an instance of this cursor icon on the cursor")]
         public GameObject cursor;
 
@@ -32,6 +35,16 @@ namespace N.Package.Input.Draggable
 
         [SerializeField]
         private DraggableEvent dropped = new DraggableEvent();
+
+        [SerializeField]
+        private ReadyEvent ready = new ReadyEvent();
+
+        /// Invoked to check if an object is ready to be dragged
+        public ReadyEvent onDraggableReady
+        {
+            get { return ready; }
+            set { ready = value; }
+        }
 
         /// Invoked when the draggable is accepted by a target
         public DraggableEvent onDraggableAccepted

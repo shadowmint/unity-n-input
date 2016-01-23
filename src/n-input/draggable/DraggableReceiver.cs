@@ -58,27 +58,9 @@ namespace N.Package.Input.Draggable
             set { leave = value; }
         }
 
-        /// Default receiver for an over/out event
-        public void DefaultReceiverHandler(ReceiveTarget target)
-        {
-            target.accept = true;
-            throw new Exception("Default handler is for example purposes only.");
-        }
-
-        /// Default receiver for a drop/click event
-        public void DefaultAcceptHandler(DraggableSource target)
-        {
-            throw new Exception("Default handler is for example purposes only.");
-        }
-
-        /// Default leave event
-        public void DefaultLeaveHandler(DraggableSource target)
-        {
-            throw new Exception("Default handler is for example purposes only.");
-        }
-
         /// Makes sure an instance exists on start
-        public void Start() {
+        public void Start()
+        {
             Draggable.RequireManager();
         }
     }

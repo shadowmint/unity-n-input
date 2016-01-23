@@ -9,6 +9,7 @@ public class DummyDraggableState : MonoBehaviour
     public Color bad;
     public Color idle;
     public bool savedIdle;
+    public bool dragReady = true;
 
     private void Color(DraggableSource target, Color c)
     {
@@ -47,5 +48,10 @@ public class DummyDraggableState : MonoBehaviour
     {
         target.gameObject.Move(target.origin);
         Color(target, idle);
+    }
+
+    public void IsDragReady(ReceiveTarget target)
+    {
+        target.accept = dragReady;
     }
 }

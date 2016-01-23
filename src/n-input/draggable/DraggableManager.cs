@@ -143,10 +143,22 @@ namespace N.Package.Input.Draggable
         {
             if ((target != null) && (currentDraggable == null))
             {
-                currentDraggable = target.gameObject;
-                currentDraggableSource = target;
-                currentDraggableSource.origin = target.gameObject.Position();
-                currentDraggableSource.onDraggableIdle.Invoke(currentDraggableSource);
+                var query = new ReceiveTarget() { source = currentDraggableSource };
+                if (target.onDraggableReady.GetPersistentEventCount() == 0)
+                {
+                    query.accept = true; // If not bindings, accept by default 
+                }
+                else
+                {
+                    target.onDraggableReady.Invoke(query);
+                }
+                if (query.accept)
+                {
+                    currentDraggable = target.gameObject;
+                    currentDraggableSource = target;
+                    currentDraggableSource.origin = target.gameObject.Position();
+                    currentDraggableSource.onDraggableIdle.Invoke(currentDraggableSource);
+                }
             }
         }
 
