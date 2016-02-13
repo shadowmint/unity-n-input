@@ -26,59 +26,19 @@ Finally, in your script, use the RawInput handler to listen for `ControllerEvent
 
     public enum Inputs {
       LEFT,
-      RIGHT,
-      FORWARDS,
-      BACKWARDS,
-      JUMP
+      RIGHT
     }
 
     public class Input : MonoBehaviour {
-
-      public float turnSpeed = 75f;
-      public float moveSpeed = 2f;
-
-      public bool forwards;
-      public bool backwards;
-      public bool left;
-      public bool right;
-
       public void Start() {
-        RawInput.Event((ev) => {
-          ev.As<ControllerEvent>().Then((evp) => {
-            if (evp.Is<Inputs>(Inputs.LEFT)) {
-              left = evp.active;
-            }
-            else if (evp.Is<Inputs>(Inputs.RIGHT)) {
-              right = evp.active;
-            }
-            else if (evp.Is<Inputs>(Inputs.FORWARDS)) {
-              forwards = evp.active;
-            }
-            else if (evp.Is<Inputs>(Inputs.BACKWARDS)) {
-              backwards = evp.active;
-            }
-            else if (evp.Is<Inputs>(Inputs.JUMP)) {
-              if (evp.active) {
-                GetComponent<Rigidbody>().AddForce(gameObject.transform.up * 200.0f);
-              }
-            }
-          });
+        RawInput.Default.Events.AddEventHandler<ControllerEvent>((ep) => {
+          if (evp.Is<Inputs>(Inputs.LEFT)) {
+            // Start turning left...
+          }
+          else if (evp.Is<Inputs>(Inputs.RIGHT)) {
+            // Start turning right...
+          }
         });
-      }
-
-      public void Update() {
-        if (forwards) {
-          gameObject.Move(gameObject.transform.forward, gameObject.transform.up, -1.0f * moveSpeed * Time.deltaTime);
-        }
-        else if (backwards) {
-          gameObject.Move(gameObject.transform.forward, gameObject.transform.up, 1.0f * moveSpeed * Time.deltaTime);
-        }
-        if (left) {
-          gameObject.Rotate(new Vector3(0f, -1.0f * turnSpeed, 0f) * Time.deltaTime);
-        }
-        else if (right) {
-          gameObject.Rotate(new Vector3(0f, 1.0f * turnSpeed, 0f) * Time.deltaTime);
-        }
       }
     }
 
@@ -86,13 +46,12 @@ Finally, in your script, use the RawInput handler to listen for `ControllerEvent
 
 1) Add a 'Raw Input Listener' component to the scene.
 
-2) To add a custom event target, extend RawEventHandler:
+2) To add a custom event target, extend `IRawEventHandler`:
 
-    public class FakeInputHandler : RawInputHandler {
+    public class FakeInputHandler : IRawInputHandler {
       public int count = 0;
-      public void UpdateFrame(Events ev) {
-      }
-      public void Update(Events ev) {
+      public void UpdateFrame(EventHandler ev) {}
+      public void Update(EventHandler ev) {
         count += 1;
         if (count == 2) {
           ev.Trigger(new FakeInputEvent());
@@ -103,11 +62,9 @@ Finally, in your script, use the RawInput handler to listen for `ControllerEvent
 3) Then register and bind it:
 
     var handler = new FakeInputHandler();
-    RawInput.Register(handler);
-    RawInput.Event((ev) => {
-      ev.As<FakeInputEvent>().Then((ep) => {
-        // ...
-      });
+    RawInput.Default.Register(handler);
+    RawInput.Default.Events.AddEventHandler<FakeInputEvent>((ev) => {
+      // ...
     });
 
 #### Existing input bindings
