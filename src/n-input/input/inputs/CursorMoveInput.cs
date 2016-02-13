@@ -16,6 +16,9 @@ namespace N.Package.Input
     /// Base event type
     public class CursorMoveEventBase : IEvent
     {
+        /// Set and get access to the event helper api
+        public IEventApi Api { get; set; }
+
         /// The GameObject instance
         public GameObject target;
 
@@ -41,7 +44,7 @@ namespace N.Package.Input
     /// triggers events for it when-ever it is over it's backing target.
     /// Notice that unlike the CursorPickInput, this input will constantly
     /// spam events.
-    public class CursorMoveInput : RawInputHandler
+    public class CursorMoveInput : IRawInputHandler
     {
         /// Singleton
         private static CursorMoveInput instance = null;
@@ -76,7 +79,7 @@ namespace N.Package.Input
                     raycastDistance = distance,
                     layerMask = layerMask,
                 };
-                RawInput.Register(instance);
+                RawInput.Default.Register(instance);
             }
         }
 
@@ -109,13 +112,13 @@ namespace N.Package.Input
         {
             if (instance != null)
             {
-                RawInput.Remove(instance);
+                RawInput.Default.Remove(instance);
                 instance = null;
             }
         }
 
         /// See if we can pick objects
-        public void Update(Events events)
+        public void Update(EventHandler events)
         {
             // Reset state
             active.Reset();
@@ -184,7 +187,7 @@ namespace N.Package.Input
         }
 
         /// Every frame
-        public void UpdateFrame(Events events)
+        public void UpdateFrame(EventHandler events)
         {
         }
     }

@@ -1,75 +1,36 @@
 using UnityEngine;
 using N;
+using N.Package.Events;
 using System.Collections.Generic;
 
 namespace N.Package.Input
 {
-    /// Static api for RawInputHandlers
+    /// The low level wrapper around Input to handle various input events
     public class RawInput
     {
-        /// Singleton
-        private static RawInputHandlers instance;
-        private static RawInputHandlers Instance
+        /// Get the default instance
+        private static RawInput instance = null;
+        public static RawInput Default
         {
             get
             {
                 if (instance == null)
                 {
-                    instance = new RawInputHandlers();
+                    instance = new RawInput();
                 }
                 return instance;
             }
         }
 
-        /// Add an event listener
-        public static void Register(RawInputHandler handler)
-        { Instance.Register(handler); }
-
-        /// Remove an event listener
-        public static void Remove(RawInputHandler handler)
-        { Instance.Remove(handler); }
-
-        /// Clear all event handlers and listeners
-        public static void Clear()
-        { Instance.Clear(); }
-
-        /// Poll all event listeners for input
-        public static void Update()
-        { Instance.Update(); }
-
-        /// Poll all event listeners for input every frame
-        public static void UpdateFrame()
-        { Instance.UpdateFrame(); }
-
-        /// Attach an event handler
-        public static void Event(N.EventHandler handler)
-        { Instance.Event(handler); }
-
-        /// Attach a single event handler
-        public static void ScopedEvent<T>(N.ScopedEventHandler<T> handler) where T : N.Event
-        { Instance.ScopedEvent(handler); }
-
-        /// Remove an event handler
-        public static void Remove(N.EventHandler handler)
-        { Instance.Remove(handler); }
-
-        /// Trigger an event from an external event source
-        public static void Trigger(N.Event item)
-        { Instance.Trigger(item); }
-    }
-
-    /// The low level wrapper around Input to handle various input events
-    public class RawInputHandlers
-    {
-
         /// The set of event listeners
-        private List<RawInputHandler> handlers = new List<RawInputHandler>();
+        private List<IRawInputHandler> handlers = new List<IRawInputHandler>();
 
         /// The event handler core
-        private Events events = new Events();
+        private EventHandler events = new EventHandler();
+        public EventHandler Events { get { return events; } }
 
-        /// Add an event listener
-        public void Register(RawInputHandler handler)
+        /// Add a raw input handler
+        public void Register(IRawInputHandler handler)
         {
             if (!handlers.Contains(handler))
             {
@@ -77,8 +38,8 @@ namespace N.Package.Input
             }
         }
 
-        /// Remove an event listener
-        public void Remove(RawInputHandler handler)
+        /// Remove a raw input handler
+        public void Remove(IRawInputHandler handler)
         {
             if (handlers.Contains(handler))
             {
@@ -86,7 +47,7 @@ namespace N.Package.Input
             }
         }
 
-        /// Clear all
+        /// Clear everything
         public void Clear()
         {
             events.Clear();
@@ -106,33 +67,6 @@ namespace N.Package.Input
         public void UpdateFrame()
         {
             handlers.ForEach((h) => h.UpdateFrame(events));
-        }
-
-        /// Add an event handler
-        public void Event(N.EventHandler handler)
-        {
-            events += handler;
-        }
-
-        /// Remove an event listener
-        public void Remove(N.EventHandler handler)
-        {
-            events.Remove(handler);
-        }
-
-        /// Add a scoped event handler
-        public void ScopedEvent<T>(N.ScopedEventHandler<T> handler) where T : N.Event
-        {
-            new ScopedEvent<T>(events, handler);
-        }
-
-        /// Trigger an event
-        public void Trigger(N.Event item)
-        {
-            if (item != null)
-            {
-                events.Trigger(item);
-            }
         }
     }
 }

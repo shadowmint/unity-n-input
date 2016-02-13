@@ -1,8 +1,9 @@
 using UnityEngine;
+using N.Package.Events;
 using N;
 
-namespace N.Package.Input {
-
+namespace N.Package.Input
+{
   /// Polls unity input and dispatches events
   [AddComponentMenu("N/Input/Raw Input Listener")]
   public class RawInputListener : MonoBehaviour {
@@ -20,9 +21,9 @@ namespace N.Package.Input {
       elapsed += timer.Step();
       if (elapsed >= interval) {
         elapsed = 0f;
-        RawInput.Update();
+        RawInput.Default.Update();
       }
-      RawInput.UpdateFrame();  // Happens every frame regardless
+      RawInput.Default.UpdateFrame();  // Happens every frame regardless
     }
   }
 }

@@ -1,25 +1,32 @@
 using N;
 using UnityEngine;
 using System.Collections.Generic;
+using N.Package.Events;
 
 namespace N.Package.Input {
 
   /// A pick event
-  public class KeyDownEvent : N.Event {
+  public class KeyDownEvent : IEvent
+  {
+      /// Set and get access to the event helper api
+      public IEventApi Api { get; set; }
 
-    /// The key that was pressed
-    public KeyCode keycode;
+      /// The key that was pressed
+      public KeyCode keycode;
   }
 
   /// A pick event
-  public class KeyUpEvent : N.Event {
+  public class KeyUpEvent : IEvent
+  {
+      /// Set and get access to the event helper api
+      public IEventApi Api { get; set; }
 
-    /// The key that was pressed
-    public KeyCode keycode;
+      /// The key that was pressed
+      public KeyCode keycode;
   }
 
   /// An input handler for collecting keyboard input
-  public class KeyInput : RawInputHandler {
+  public class KeyInput : IRawInputHandler {
 
     /// Singleton
     private static KeyInput instance = null;
@@ -31,14 +38,14 @@ namespace N.Package.Input {
     public static void Enable() {
       if (instance == null) {
         instance = new KeyInput();
-        RawInput.Register(instance);
+        RawInput.Default.Register(instance);
       }
     }
 
     /// Disable
     public static void Disable() {
       if (instance != null) {
-        RawInput.Remove(instance);
+        RawInput.Default.Remove(instance);
         instance = null;
       }
     }
@@ -53,11 +60,11 @@ namespace N.Package.Input {
     }
 
     /// Check for inputs periodically
-    public void Update(Events events) {
+    public void Update(EventHandler events) {
     }
 
     /// Check for inputs every frame, regardless
-    public void UpdateFrame(Events events) {
+    public void UpdateFrame(EventHandler events) {
       foreach (var code in keycodes) {
         if (UnityEngine.Input.GetKeyDown(code)) {
           events.Trigger(new KeyDownEvent() { keycode = code });
@@ -68,18 +75,4 @@ namespace N.Package.Input {
       }
     }
   }
-
-  #if UNITY_EDITOR
-  public class KeyInputTests {
-    public void test_key_input() {
-      KeyInput.Enable();
-      KeyInput.Key(KeyCode.Space);
-      RawInput.Event((ev) => {
-        ev.As<KeyDownEvent>().Then((ep) => {
-          // ...
-        });
-      });
-    }
-  }
-  #endif
 }

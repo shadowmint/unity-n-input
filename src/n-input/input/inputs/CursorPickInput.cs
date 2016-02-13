@@ -1,11 +1,15 @@
 using N;
 using UnityEngine;
+using N.Package.Events;
 
 namespace N.Package.Input
 {
     /// A pick event
-    public class CursorPickEvent : N.Event
+    public class CursorPickEvent : IEvent
     {
+        /// Set and get access to the event helper api
+        public IEventApi Api { get; set; }
+
         /// The id of the pointer that triggered this event
         public int pointerId;
 
@@ -17,7 +21,7 @@ namespace N.Package.Input
     }
 
     /// An input handler for picking objects on the scene.
-    public class CursorPickInput : RawInputHandler
+    public class CursorPickInput : IRawInputHandler
     {
         /// Singleton
         private static CursorPickInput instance = null;
@@ -43,7 +47,7 @@ namespace N.Package.Input
                     layerMask = layerMask,
                     componentFilter = componentFilter
                 };
-                RawInput.Register(instance);
+                RawInput.Default.Register(instance);
             }
         }
 
@@ -52,13 +56,13 @@ namespace N.Package.Input
         {
             if (instance != null)
             {
-                RawInput.Remove(instance);
+                RawInput.Default.Remove(instance);
                 instance = null;
             }
         }
 
         /// See if we can pick objects
-        public void Update(Events events)
+        public void Update(EventHandler events)
         {
             bool matched = false;
             bool active;
@@ -108,7 +112,7 @@ namespace N.Package.Input
         }
 
         /// Every frame
-        public void UpdateFrame(Events events)
+        public void UpdateFrame(EventHandler events)
         {
         }
 
@@ -146,21 +150,4 @@ namespace N.Package.Input
             return -1;
         }
     }
-
-#if UNITY_EDITOR
-    public class CursorPickTests
-    {
-        public void test_pick_target()
-        {
-            CursorPickInput.Enable();
-            RawInput.Event((ev) =>
-            {
-                ev.As<CursorPickEvent>().Then((ep) =>
-                {
-                    // ...
-                });
-            });
-        }
-    }
-#endif
 }

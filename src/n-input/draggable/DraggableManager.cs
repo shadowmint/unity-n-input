@@ -47,26 +47,23 @@ namespace N.Package.Input.Draggable
                 throw new System.Exception("Draggable manager must have a backing target set");
             }
 
-            RawInput.Event((ev) =>
+            // If we get up or down on a cursor, start dragging or stop dragging
+            RawInput.Default.Events.AddEventHandler<CursorPickEvent>((evp) =>
             {
-                // If we get up or down on a cursor, start dragging or stop dragging
-                ev.As<CursorPickEvent>().Then((evp) =>
+                if (evp.active)
                 {
-                    if (evp.active)
-                    {
-                        StartDragging(evp.hit.GetComponent<DraggableSource>());
-                    }
-                    else
-                    {
-                        StopDragging();
-                    }
-                });
-
-                // Receiver updates
-                ev.As<CursorOverEvent>().Then((evp) => { UpdateDrag(evp); });
-                ev.As<CursorEnterEvent>().Then((evp) => { EnterReceiver(evp); });
-                ev.As<CursorLeaveEvent>().Then((evp) => { LeaveReceiver(evp); });
+                    StartDragging(evp.hit.GetComponent<DraggableSource>());
+                }
+                else
+                {
+                    StopDragging();
+                }
             });
+
+            // Receiver updates
+            RawInput.Default.Events.AddEventHandler<CursorOverEvent>((evp) => { UpdateDrag(evp); });
+            RawInput.Default.Events.AddEventHandler<CursorEnterEvent>((evp) => { EnterReceiver(evp); });
+            RawInput.Default.Events.AddEventHandler<CursorLeaveEvent>((evp) => { LeaveReceiver(evp); });
         }
 
         /// Enter a Receiver area
@@ -151,7 +148,7 @@ namespace N.Package.Input.Draggable
                 var query = new ReceiveTarget() { source = target };
                 if (target.onDraggableReady.GetPersistentEventCount() == 0)
                 {
-                    query.accept = true; // If not bindings, accept by default 
+                    query.accept = true; // If not bindings, accept by default
                 }
                 else
                 {
