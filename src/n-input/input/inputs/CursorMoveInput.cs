@@ -2,6 +2,7 @@ using N;
 using UnityEngine;
 using System.Collections.Generic;
 using N.Package.Input.Impl.CursorMoveInput;
+using N.Package.Events;
 
 namespace N.Package.Input
 {
@@ -13,7 +14,7 @@ namespace N.Package.Input
     }
 
     /// Base event type
-    public class CursorMoveEventBase : N.Event
+    public class CursorMoveEventBase : IEvent
     {
         /// The GameObject instance
         public GameObject target;

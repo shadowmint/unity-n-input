@@ -1,11 +1,15 @@
 using N.Reflect;
+using N.Package.Events;
 using System.Collections.Generic;
 using System;
 
 namespace N.Package.Controller {
 
   /// A pick event
-  public class ControllerEvent : N.Event {
+  public class ControllerEvent : IEvent {
+
+    /// Set and get access to the event helper api
+    public IEventApi Api { get; set; }
 
     /// The code of the incoming event
     public string id;
