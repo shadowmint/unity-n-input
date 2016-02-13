@@ -148,7 +148,7 @@ namespace N.Package.Input.Draggable
         {
             if ((target != null) && (currentDraggable == null))
             {
-                var query = new ReceiveTarget() { source = currentDraggableSource };
+                var query = new ReceiveTarget() { source = target };
                 if (target.onDraggableReady.GetPersistentEventCount() == 0)
                 {
                     query.accept = true; // If not bindings, accept by default 
