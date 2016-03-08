@@ -10,12 +10,9 @@ public class CursorPickTests
     public void test_pick_target()
     {
         CursorPickInput.Enable();
-        RawInput.Event((ev) =>
+        RawInput.Default.Events.AddEventHandler<CursorPickEvent>((ev) =>
         {
-            ev.As<CursorPickEvent>().Then((ep) =>
-            {
-                    // ...
-                });
+            // ...
         });
     }
 }

@@ -12,12 +12,9 @@ public class KeyInputTests
     {
         KeyInput.Enable();
         KeyInput.Key(KeyCode.Space);
-        RawInput.Event((ev) =>
+        RawInput.Default.Events.AddEventHandler<KeyDownEvent>((ev) =>
         {
-            ev.As<KeyDownEvent>().Then((ep) =>
-            {
-                // ...
-            });
+            // ...
         });
     }
 }
