@@ -39,7 +39,7 @@ namespace N.Package.Input.Draggable.Internal
                 var count = op.ProcessReceivers();
                 if (count == 0)
                 {
-                    op.source.OnReceivedBy(null);  // Released with no receiver
+                    op.source.OnDragStop();  // Released with no receiver
                 }
                 op.display.StopDragging();
             }
@@ -59,7 +59,7 @@ namespace N.Package.Input.Draggable.Internal
                     {
                         if (!active.receivers.Contains(receiver))
                         {
-                            active.source.OverValidTarget(receiver);
+                            active.source.EnterTarget(receiver, true);
                             receiver.DraggableEntered(draggable, valid);
                             active.receivers.Add(receiver);
                         }
@@ -68,7 +68,7 @@ namespace N.Package.Input.Draggable.Internal
                     {
                         if (!active.invalid.Contains(receiver))
                         {
-                            active.source.OverInvalidTarget(receiver);
+                            active.source.EnterTarget(receiver, false);
                             receiver.DraggableEntered(draggable, valid);
                             active.invalid.Add(receiver);
                         }
@@ -86,11 +86,13 @@ namespace N.Package.Input.Draggable.Internal
                 if (active.receivers.Contains(receiver))
                 {
                     receiver.DraggableLeft(draggable);
+                    active.source.ExitTarget(receiver);
                     active.receivers.Remove(receiver);
                 }
                 else if (active.invalid.Contains(receiver))
                 {
                     receiver.DraggableLeft(draggable);
+                    active.source.ExitTarget(receiver);
                     active.invalid.Remove(receiver);
                 }
             }
@@ -114,11 +116,11 @@ namespace N.Package.Input.Draggable.Internal
         }
 
         /// Process move event
-        public void Move(Vector3 intersectAt)
+        public void Move(Vector3 intersectAt, Vector3 objectOffset, Vector3 cursorOffset)
         {
             foreach (var op in pool.Values)
             {
-                op.display.Move(intersectAt);
+                op.display.Move(intersectAt, objectOffset, cursorOffset);
             }
         }
     }

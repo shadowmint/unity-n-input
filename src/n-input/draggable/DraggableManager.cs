@@ -1,6 +1,7 @@
 using N;
 using N.Package.Input;
 using UnityEngine;
+using N.Package.Input.Draggable.Internal;
 
 namespace N.Package.Input.Draggable
 {
@@ -23,175 +24,51 @@ namespace N.Package.Input.Draggable
         [Tooltip("Raycast distance to pick targets with")]
         public float raycastDistance = 100f;
 
-        [Tooltip("Is a draggable currently active? If so, this is it.")]
-        public GameObject currentDraggable;
-        private DraggableSource currentDraggableSource;
-
-        [Tooltip("Is there a currently active receiver? If so, this is it.")]
-        public GameObject currentReceiver;
-        private DraggableReceiver currentDraggableReceiver;
-        private bool acceptedReceiver;
+        /// The cursor input handler
+        private CursorInputHandler inputHandler;
 
         public void Start()
         {
-            // Bind input events for clicks on targets
-            CursorPickInput.Enable(raycastDistance, layerMask, typeof(DraggableSource));
-            CursorMoveInput.Enable(raycastDistance, layerMask);
-            CursorMoveInput.Track(referenceBacking);
-            CursorMoveInput.Track(typeof(DraggableReceiver));
-
-            // Check and reset
-            currentDraggable = null;
+            // Check state
             if (referenceBacking == null)
             {
                 throw new System.Exception("Draggable manager must have a backing target set");
             }
+
+            // Setup handler
+            inputHandler = new CursorInputHandler(referenceBacking);
+            inputHandler.AcceptCursor(0);
+            inputHandler.objectOffset = referenceBackingOffset;
+            inputHandler.cursorOffset = referenceBackingCursorOffset;
+
+            // Bind input events for clicks on targets
+            CursorPickInput.Enable(raycastDistance, layerMask, typeof(DraggableBase));
+            CursorMoveInput.Enable(raycastDistance, layerMask);
+            CursorMoveInput.Track(referenceBacking);
+            CursorMoveInput.Track(typeof(DraggableBase));
 
             // If we get up or down on a cursor, start dragging or stop dragging
             RawInput.Default.Events.AddEventHandler<CursorPickEvent>((evp) =>
             {
                 if (evp.active)
                 {
-                    StartDragging(evp.hit.GetComponent<DraggableSource>());
+                    inputHandler.CursorDown(evp.pointerId, evp.hit);
                 }
                 else
                 {
-                    StopDragging();
+                    inputHandler.CursorUp(evp.pointerId);
                 }
             });
 
             // Receiver updates
-            RawInput.Default.Events.AddEventHandler<CursorOverEvent>((evp) => { UpdateDrag(evp); });
-            RawInput.Default.Events.AddEventHandler<CursorEnterEvent>((evp) => { EnterReceiver(evp); });
-            RawInput.Default.Events.AddEventHandler<CursorLeaveEvent>((evp) => { LeaveReceiver(evp); });
-        }
+            RawInput.Default.Events.AddEventHandler<CursorEnterEvent>((evp) =>
+            { inputHandler.CursorEnter(evp.target); });
 
-        /// Enter a Receiver area
-        private void EnterReceiver(CursorEnterEvent ev)
-        {
-            if ((currentDraggable != null) && (ev.target != currentDraggable))
-            {
-                if (ev.type == typeof(DraggableReceiver))
-                {
-                    // If we currently have no receiver, save it
-                    // This allows for draggables to overlap and we keep only the matching target
-                    if (currentReceiver == null)
-                    {
-                        // Save receiver
-                        currentDraggableReceiver = ev.target.GetComponent<DraggableReceiver>();
-                        currentReceiver = ev.target;
+            RawInput.Default.Events.AddEventHandler<CursorLeaveEvent>((evp) =>
+            { inputHandler.CursorLeave(evp.target); });
 
-                        // Check if valid?
-                        var query = new ReceiveTarget() { source = currentDraggableSource };
-                        currentDraggableReceiver.onCheckDraggable.Invoke(query);
-                        acceptedReceiver = query.accept;
-
-                        // Update
-                        if (acceptedReceiver)
-                        {
-                            currentDraggableSource.onDraggableAccepted.Invoke(currentDraggableSource);
-                        }
-                        else
-                        {
-                            currentDraggableSource.onDraggableRejected.Invoke(currentDraggableSource);
-                        }
-                    }
-                }
-            }
-        }
-
-        /// Exit a Receiver area
-        private void LeaveReceiver(CursorLeaveEvent ev)
-        {
-            if (currentReceiver != null)
-            {
-                if (ev.target == currentReceiver)
-                {
-                    currentDraggableSource.onDraggableIdle.Invoke(currentDraggableSource);
-                    currentDraggableReceiver.onLeaveDraggable.Invoke(currentDraggableSource);
-                    currentReceiver = null;
-                    currentDraggableReceiver = null;
-                }
-            }
-            else if (currentDraggable != null)
-            {
-                currentDraggableSource.onDraggableIdle.Invoke(currentDraggableSource);
-            }
-        }
-
-        /// Update the current position of the draggable marker
-        private void UpdateDrag(CursorOverEvent update)
-        {
-            if (currentDraggable != null)
-            {
-                if (update.target == referenceBacking)
-                {
-                    var target = update.point;
-                    var cursor = currentDraggableSource.GetCursor();
-                    if (cursor != null)
-                    {
-                        cursor.Move(target + referenceBackingCursorOffset);
-                    }
-                    if (currentDraggableSource.dragSelf)
-                    {
-                        currentDraggable.Move(target + referenceBackingOffset);
-                    }
-                }
-            }
-        }
-
-        /// Begin dragging an object
-        private void StartDragging(DraggableSource target)
-        {
-            if ((target != null) && (currentDraggable == null))
-            {
-                var query = new ReceiveTarget() { source = target };
-                if (target.onDraggableReady.GetPersistentEventCount() == 0)
-                {
-                    query.accept = true; // If not bindings, accept by default
-                }
-                else
-                {
-                    target.onDraggableReady.Invoke(query);
-                }
-                if (query.accept)
-                {
-                    currentDraggable = target.gameObject;
-                    currentDraggableSource = target;
-                    currentDraggableSource.origin = target.gameObject.Position();
-                    currentDraggableSource.onDraggableIdle.Invoke(currentDraggableSource);
-                }
-            }
-        }
-
-        /// Stop dragging an object
-        private void StopDragging()
-        {
-            bool accepted = false;
-            if (currentDraggable != null)
-            {
-                if (currentReceiver != null)
-                {
-                    if (acceptedReceiver)
-                    {
-                        currentDraggableReceiver.onAcceptDraggable.Invoke(currentDraggableSource);
-                        accepted = true;
-                    }
-                }
-                if (!accepted)
-                {
-                    currentDraggableSource.onDraggableDropped.Invoke(currentDraggableSource);
-                    if (currentReceiver != null)
-                    {
-                        currentDraggableReceiver.onLeaveDraggable.Invoke(currentDraggableSource);
-                    }
-                }
-                currentDraggableSource.DestroyCursor();
-                currentDraggableSource = null;
-                currentDraggable = null;
-                currentReceiver = null;
-                currentDraggableReceiver = null;
-            }
+            RawInput.Default.Events.AddEventHandler<CursorOverEvent>((evp) =>
+            { inputHandler.CursorMove(evp.target, evp.point); });
         }
     }
 }

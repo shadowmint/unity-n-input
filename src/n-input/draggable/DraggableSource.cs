@@ -2,16 +2,14 @@ using N;
 using System;
 using UnityEngine;
 using UnityEngine.Events;
+using N.Package.Input.Draggable.Internal;
 
 namespace N.Package.Input.Draggable
 {
     /// Makes it possible to drag a Draggable from the GameObject
     [AddComponentMenu("N/Input/Draggable/Draggable Source")]
-    public class DraggableSource : MonoBehaviour
+    public class DraggableSource : DraggableBase, IDraggableSource
     {
-        [Serializable]
-        public class ReadyEvent : UnityEvent<ReceiveTarget> { }
-
         [Tooltip("When dragging, create an instance of this cursor icon on the cursor")]
         public GameObject cursor;
 
@@ -21,87 +19,94 @@ namespace N.Package.Input.Draggable
         [Tooltip("The origin for where this drag started")]
         public Vector3 origin;
 
-        [Serializable]
-        public class DraggableEvent : UnityEvent<DraggableSource> { }
+        [Tooltip("Bind functions to check if drag can start")]
+        public CheckReadyEvent canDragStart = new CheckReadyEvent();
 
-        [SerializeField]
-        private DraggableEvent accept = new DraggableEvent();
+        [Tooltip("Bind functions to run when drag starts")]
+        public DraggableEvent onStart = new DraggableEvent();
 
-        [SerializeField]
-        private DraggableEvent reject = new DraggableEvent();
+        [Tooltip("Bind functions to run when drag stops")]
+        public DraggableEvent onStop = new DraggableEvent();
 
-        [SerializeField]
-        private DraggableEvent idle = new DraggableEvent();
+        [Tooltip("Bind functions to run when drag stops over a valid receiver")]
+        public ReceiverEvent onReceived = new ReceiverEvent();
 
-        [SerializeField]
-        private DraggableEvent dropped = new DraggableEvent();
+        [Tooltip("Bind functions to run when drag moves over receiver")]
+        public OverEvent enterReceiver = new OverEvent();
 
-        [SerializeField]
-        private ReadyEvent ready = new ReadyEvent();
-
-        /// Invoked to check if an object is ready to be dragged
-        public ReadyEvent onDraggableReady
-        {
-            get { return ready; }
-            set { ready = value; }
-        }
-
-        /// Invoked when the draggable is accepted by a target
-        public DraggableEvent onDraggableAccepted
-        {
-            get { return accept; }
-            set { accept = value; }
-        }
-
-        /// Invoked when the draggable is rejected by a target
-        public DraggableEvent onDraggableRejected
-        {
-            get { return reject; }
-            set { reject = value; }
-        }
-
-        /// Invoked when the draggable becomes idle
-        public DraggableEvent onDraggableIdle
-        {
-            get { return idle; }
-            set { idle = value; }
-        }
-
-        /// Invoked when the draggable is dropped in the middle of no where
-        /// Notice this is not invoked if the target accepts the draggable
-        public DraggableEvent onDraggableDropped
-        {
-            get { return dropped; }
-            set { dropped = value; }
-        }
-
-        /// Current active cursor object
-        private GameObject cursorInstance;
-
-        /// Generate and return a new cursor for this object
-        public GameObject GetCursor() {
-            GameObject rtn = cursorInstance;
-            if ((rtn == null) && (cursor != null))
-            {
-                Scene.Spawn(cursor).Then((cp) => { rtn = cp; });
-            }
-            cursorInstance = rtn;
-            return rtn;
-        }
-
-        /// Destroy the cursor for this object
-        public void DestroyCursor()
-        {
-            if (cursorInstance != null)
-            {
-                GameObject.Destroy(cursorInstance);
-            }
-        }
+        [Tooltip("Bind functions to run when drag moves off a receiver")]
+        public ReceiverEvent exitReceiver = new ReceiverEvent();
 
         /// Makes sure a manager exists
         public void Start()
         {
             Draggable.RequireManager();
+        }
+
+        /// IDraggableSource
+        public override IDraggableSource Source { get { return this; } }
+
+        public GameObject DragCursor { get; set; }
+
+        public GameObject CursorFactory { get { return cursor; } }
+
+        public GameObject GameObject { get { return this.gameObject; } }
+
+        public bool DragObject { get { return dragSelf; } }
+
+        public bool CanDragStart()
+        {
+            if (canDragStart.GetPersistentEventCount() > 0)
+            {
+                var args = new DraggableCanStart();
+                args.accept = false;
+                canDragStart.Invoke(args);
+                return args.accept;
+            }
+            return false;
+        }
+
+        public void OnDragStart()
+        {
+            if (onStart.GetPersistentEventCount() > 0)
+            {
+                onStart.Invoke(null);
+            }
+        }
+
+        public void OnDragStop()
+        {
+            if (onStop.GetPersistentEventCount() > 0)
+            {
+                onStop.Invoke(null);
+            }
+        }
+
+        public void OnReceivedBy(IDraggableReceiver receiver)
+        {
+            if (onReceived.GetPersistentEventCount() > 0)
+            {
+                onReceived.Invoke(receiver);
+            }
+        }
+
+        public void EnterTarget(IDraggableReceiver target, bool valid)
+        {
+            if (enterReceiver.GetPersistentEventCount() > 0)
+            {
+                var args = new DraggableOverReceiver();
+                args.receiver = target;
+                args.valid = valid;
+                enterReceiver.Invoke(args);
+            }
+         }
+
+        public void ExitTarget(IDraggableReceiver target)
+        {
+            if (exitReceiver.GetPersistentEventCount() > 0)
+            {
+                exitReceiver.Invoke(target);
+            }
         }
     }
 }

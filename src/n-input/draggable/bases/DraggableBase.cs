@@ -9,9 +9,9 @@ namespace N.Package.Input.Draggable
     public abstract class DraggableBase : MonoBehaviour
     {
         /// The source if this component provides one
-        public IDraggableSource Source { get { return null; } }
+        public virtual IDraggableSource Source { get { return null; } }
 
         /// The receiver if this componen
-        public IDraggableReceiver Receiver { get { return null; } }
+        public virtual IDraggableReceiver Receiver { get { return null; } }
     }
 }

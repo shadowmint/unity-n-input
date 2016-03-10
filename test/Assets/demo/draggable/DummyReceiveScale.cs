@@ -9,11 +9,15 @@ public class DummyReceiveScale : MonoBehaviour
 
     public bool accept;
 
-    /// Default receiver for an over/out event
-    public void ReceiverHandler(ReceiveTarget target)
+    public void CheckSource(DraggableEvent query)
     {
-        target.accept = accept;
-        if (accept && !scale)
+        query.accept = this.accept;
+    }
+
+    /// Default leave event
+    public void EnterHandler(DraggableEvent ep)
+    {
+        if (ep.accept && !scale)
         {
             this.gameObject.transform.localScale = new Vector3(2, 1, 2);
             scale = true;
@@ -26,17 +30,15 @@ public class DummyReceiveScale : MonoBehaviour
     }
 
     /// Default leave event
-    public void LeaveHandler(DraggableSource target)
+    public void LeaveHandler(DraggableEvent target)
     {
         ResetScale();
     }
 
     /// Default receiver for a drop/click event
-    public void AcceptHandler(DraggableSource target)
+    public void AcceptHandler(DraggableEvent target)
     {
-        target.gameObject.Move(target.origin);
         ResetScale();
-        _.Log("accepted target dropped");
     }
 
     private void ResetScale()

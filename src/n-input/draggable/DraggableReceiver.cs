@@ -2,66 +2,75 @@ using N;
 using UnityEngine;
 using UnityEngine.Events;
 using System;
+using N.Package.Input.Draggable.Internal;
 
 namespace N.Package.Input.Draggable
 {
-    /// Use this to run event targets on a DraggableReceiver
-    public class ReceiveTarget
-    {
-        /// The source object
-        public DraggableSource source;
-
-        /// Set this to true to accept the target.
-        public bool accept;
-    }
-
     /// Makes it possible to drag a Draggable from the GameObject
     [AddComponentMenu("N/Input/Draggable/Draggable Receiver")]
-    public class DraggableReceiver : MonoBehaviour
+    public class DraggableReceiver : DraggableBase, IDraggableReceiver
     {
-        [Serializable]
-        public class ReceiverEvent : UnityEvent<ReceiveTarget> { }
+        [Tooltip("Check if a draggable is valid for this receiver")]
+        public CheckSourceEvent isValid = new CheckSourceEvent();
 
-        [Serializable]
-        public class DraggableEvent : UnityEvent<DraggableSource> { }
+        [Tooltip("Handle a draggalbe which is dropped on this receiver")]
+        public DraggableEvent onAccept = new DraggableEvent();
 
-        [SerializeField]
-        private ReceiverEvent check = new ReceiverEvent();
+        [Tooltip("Invoked if the draggable leaves this receiver.")]
+        public DraggableEvent onLeave = new DraggableEvent();
 
-        [SerializeField]
-        private DraggableEvent accept = new DraggableEvent();
-
-        [SerializeField]
-        private DraggableEvent leave = new DraggableEvent();
-
-        /// Return true or false and update state depending on if this receiver
-        /// can accept the draggable object.
-        public ReceiverEvent onCheckDraggable
-        {
-            get { return check; }
-            set { check = value; }
-        }
-
-        /// The draggable has been dropped here, deal with it
-        /// This can only be invoked if onCheckSourceDraggable accepted
-        public DraggableEvent onAcceptDraggable
-        {
-            get { return accept; }
-            set { accept = value; }
-        }
-
-        /// Invoked if the draggable leaves this receiver without dropping
-        /// anything on it.
-        public DraggableEvent onLeaveDraggable
-        {
-            get { return leave; }
-            set { leave = value; }
-        }
+        [Tooltip("Invoked if the draggable enters this receiver.")]
+        public EnterEvent onEnter = new EnterEvent();
 
         /// Makes sure an instance exists on start
         public void Start()
         {
             Draggable.RequireManager();
+        }
+
+        /// Receiver api
+        public override IDraggableReceiver Receiver { get { return this; } }
+
+        public GameObject GameObject { get { return this.gameObject; } }
+
+        public bool IsValidDraggable(IDraggableSource draggable)
+        {
+            if (isValid.GetPersistentEventCount() > 0)
+            {
+                var check = new DraggableIsValid();
+                check.source = draggable;
+                check.accept = false;
+                isValid.Invoke(check);
+                return check.accept;
+            }
+            return false;
+        }
+
+        public void DraggableEntered(IDraggableSource draggable, bool isValid)
+        {
+            if (onEnter.GetPersistentEventCount() > 0)
+            {
+                var enter = new DraggableEntered();
+                enter.source = draggable;
+                enter.valid = isValid;
+                onEnter.Invoke(enter);
+            }
+        }
+
+        public void DraggableLeft(IDraggableSource draggable)
+        {
+            if (onLeave.GetPersistentEventCount() > 0)
+            {
+                onLeave.Invoke(draggable);
+            }
+        }
+
+        public void OnReceiveDraggable(IDraggableSource draggable)
+        {
+            if (onAccept.GetPersistentEventCount() > 0)
+            {
+                onAccept.Invoke(draggable);
+            }
         }
     }
 }

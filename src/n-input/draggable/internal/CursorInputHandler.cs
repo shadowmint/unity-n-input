@@ -17,6 +17,12 @@ namespace N.Package.Input.Draggable.Internal
         /// Pool of active objects
         private ActivePool pool = new ActivePool();
 
+        /// Offset for the cursor to be moved in
+        public Vector3 cursorOffset;
+
+        /// Offset for the object to be moved in
+        public Vector3 objectOffset;
+
         /// Create a new instance, providing a drag plane
         public CursorInputHandler(GameObject dragPlane)
         {
@@ -39,22 +45,29 @@ namespace N.Package.Input.Draggable.Internal
         }
 
         /// Return true if any drag is currently happening
-        public bool Busy()
+        public bool Busy
         {
-            return pool.Count > 0;
+            get
+            {
+                return pool.Count > 0;
+            }
         }
 
         /// Handle a cursor pick
         public void CursorDown(int cursorId, GameObject target)
         {
-            foreach (var draggable in target.GetComponentsInChildren<DraggableBase>())
+            if (IsValidCursor(cursorId))
             {
-                if (draggable.Source != null)
+                N.Console.Debug();
+                foreach (var draggable in target.GetComponentsInChildren<DraggableBase>())
                 {
-                    if (draggable.Source.CanDragStart())
+                    if (draggable.Source != null)
                     {
-                        draggable.Source.OnDragStart();
-                        pool.StartDragging(draggable.Source);
+                        if (draggable.Source.CanDragStart())
+                        {
+                            draggable.Source.OnDragStart();
+                            pool.StartDragging(draggable.Source);
+                        }
                     }
                 }
             }
@@ -62,7 +75,10 @@ namespace N.Package.Input.Draggable.Internal
 
         public void CursorUp(int cursorId)
         {
-            pool.StopDragging();
+            if (IsValidCursor(cursorId))
+            {
+                pool.StopDragging();
+            }
         }
 
         public void CursorEnter(GameObject target)
@@ -91,7 +107,7 @@ namespace N.Package.Input.Draggable.Internal
         {
             if (target == dragPlane)
             {
-                pool.Move(intersectsAt);
+                pool.Move(intersectsAt, objectOffset, cursorOffset);
             }
         }
     }

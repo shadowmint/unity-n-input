@@ -1,6 +1,6 @@
 {
   "name": "unity-n-input",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Input handling scripts",
   "main": "index.js",
   "repository": {
