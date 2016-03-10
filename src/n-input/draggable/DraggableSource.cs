@@ -16,31 +16,39 @@ namespace N.Package.Input.Draggable
         [Tooltip("When dragging, drag the object itself as well as showing the cursor")]
         public bool dragSelf;
 
-        [Tooltip("The origin for where this drag started")]
-        public Vector3 origin;
-
         [Tooltip("Bind functions to check if drag can start")]
-        public CheckReadyEvent canDragStart = new CheckReadyEvent();
+        public DraggableUnityEvent canDragStart = new DraggableUnityEvent();
 
         [Tooltip("Bind functions to run when drag starts")]
-        public DraggableEvent onStart = new DraggableEvent();
+        public DraggableUnityEvent onStart = new DraggableUnityEvent();
 
         [Tooltip("Bind functions to run when drag stops")]
-        public DraggableEvent onStop = new DraggableEvent();
-
-        [Tooltip("Bind functions to run when drag stops over a valid receiver")]
-        public ReceiverEvent onReceived = new ReceiverEvent();
+        public DraggableUnityEvent onStop = new DraggableUnityEvent();
 
         [Tooltip("Bind functions to run when drag moves over receiver")]
-        public OverEvent enterReceiver = new OverEvent();
+        public DraggableUnityEvent enterReceiver = new DraggableUnityEvent();
 
         [Tooltip("Bind functions to run when drag moves off a receiver")]
-        public ReceiverEvent exitReceiver = new ReceiverEvent();
+        public DraggableUnityEvent exitReceiver = new DraggableUnityEvent();
+
+        [Tooltip("Bind functions to run when drag stops over a valid receiver")]
+        public DraggableUnityEvent onReceived = new DraggableUnityEvent();
 
         /// Makes sure a manager exists
         public void Start()
         {
             Draggable.RequireManager();
+        }
+
+        /// Return arguments
+        private DraggableEvent Args(IDraggableReceiver receiver, bool accept)
+        {
+            return new DraggableEvent()
+            {
+                accept = accept,
+                source = this,
+                receiver = receiver
+            };
         }
 
         /// IDraggableSource
@@ -58,8 +66,8 @@ namespace N.Package.Input.Draggable
         {
             if (canDragStart.GetPersistentEventCount() > 0)
             {
-                var args = new DraggableCanStart();
-                args.accept = false;
+
+                var args = Args(null, false);
                 canDragStart.Invoke(args);
                 return args.accept;
             }
@@ -70,7 +78,7 @@ namespace N.Package.Input.Draggable
         {
             if (onStart.GetPersistentEventCount() > 0)
             {
-                onStart.Invoke(null);
+                onStart.Invoke(Args(null, false));
             }
         }
 
@@ -78,7 +86,7 @@ namespace N.Package.Input.Draggable
         {
             if (onStop.GetPersistentEventCount() > 0)
             {
-                onStop.Invoke(null);
+                onStop.Invoke(Args(null, false));
             }
         }
 
@@ -86,7 +94,7 @@ namespace N.Package.Input.Draggable
         {
             if (onReceived.GetPersistentEventCount() > 0)
             {
-                onReceived.Invoke(receiver);
+                onReceived.Invoke(Args(receiver, true));
             }
         }
 
@@ -94,10 +102,7 @@ namespace N.Package.Input.Draggable
         {
             if (enterReceiver.GetPersistentEventCount() > 0)
             {
-                var args = new DraggableOverReceiver();
-                args.receiver = target;
-                args.valid = valid;
-                enterReceiver.Invoke(args);
+                enterReceiver.Invoke(Args(target, valid));
             }
          }
 
@@ -105,7 +110,7 @@ namespace N.Package.Input.Draggable
         {
             if (exitReceiver.GetPersistentEventCount() > 0)
             {
-                exitReceiver.Invoke(target);
+                exitReceiver.Invoke(Args(target, false));
             }
         }
     }

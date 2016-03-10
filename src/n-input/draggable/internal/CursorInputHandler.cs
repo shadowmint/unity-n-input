@@ -58,7 +58,6 @@ namespace N.Package.Input.Draggable.Internal
         {
             if (IsValidCursor(cursorId))
             {
-                N.Console.Debug();
                 foreach (var draggable in target.GetComponentsInChildren<DraggableBase>())
                 {
                     if (draggable.Source != null)
@@ -77,7 +76,7 @@ namespace N.Package.Input.Draggable.Internal
         {
             if (IsValidCursor(cursorId))
             {
-                pool.StopDragging();
+                pool.StopDragging(cursorId);
             }
         }
 
@@ -94,12 +93,19 @@ namespace N.Package.Input.Draggable.Internal
 
         public void CursorLeave(GameObject target)
         {
-            foreach (var draggable in target.GetComponentsInChildren<DraggableBase>())
+            try
             {
-                if (draggable.Receiver != null)
+                foreach (var draggable in target.GetComponentsInChildren<DraggableBase>())
                 {
-                    pool.ProcessReceiver(draggable.Receiver, false);
+                    if (draggable.Receiver != null)
+                    {
+                        pool.ProcessReceiver(draggable.Receiver, false);
+                    }
                 }
+            }
+            catch(MissingReferenceException)
+            {
+                // Object was already destroyed. Leave it.
             }
         }
 

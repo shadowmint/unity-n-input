@@ -54,7 +54,10 @@ namespace N.Package.Input.Draggable.Internal
             {
                 cursor.transform.position = position + cursorOffset;
             }
-            source.GameObject.transform.position = position + objectOffset;
+            if (source.DragObject)
+            {
+                source.GameObject.transform.position = position + objectOffset;
+            }
         }
     }
 }

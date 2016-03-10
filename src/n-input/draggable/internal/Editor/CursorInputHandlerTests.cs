@@ -16,7 +16,7 @@ public class CursorInputHandlerTests : N.Tests.Test
         public GameObject CursorFactory { get; set; }
         public GameObject DragCursor { get; set; }
         public GameObject GameObject { get { return this.gameObject; } }
-        public bool DragObject { get { return false; } }
+        public bool DragObject { get; set; }
         public bool CanDragStart() { return true; }
         public void OnDragStart() {}
         public void OnDragStop() {}
@@ -96,6 +96,7 @@ public class CursorInputHandlerTests : N.Tests.Test
 
         var source = this.SpawnComponent<FakeSource>();
         source.DragCursor = this.SpawnBlank();
+        source.DragObject = true;
 
         var receiver = this.SpawnComponent<FakeReceiver>();
 
@@ -117,6 +118,36 @@ public class CursorInputHandlerTests : N.Tests.Test
     }
 
     [Test]
+    public void test_drag_only_cursor()
+    {
+        var dummy = this.SpawnBlank();
+        var instance = new CursorInputHandler(dummy);
+        instance.AcceptCursor(0);
+
+        var source = this.SpawnComponent<FakeSource>();
+        source.DragCursor = this.SpawnBlank();
+        source.DragObject = false;
+
+        var receiver = this.SpawnComponent<FakeReceiver>();
+
+        instance.CursorDown(0, source.gameObject);
+        Assert(instance.Busy);
+
+        instance.CursorEnter(receiver.gameObject);
+
+        instance.CursorMove(dummy, new Vector3(1f, 1f, 1f));
+        Assert(source.gameObject.transform.position == new Vector3(0f, 0f, 0f));
+
+        instance.CursorLeave(receiver.gameObject);
+
+        instance.CursorUp(0);
+        Assert(!instance.Busy);
+        Assert(!receiver.triggered);
+
+        this.TearDown();
+    }
+
+    [Test]
     public void test_drop()
     {
         var dummy = this.SpawnBlank();
@@ -125,6 +156,7 @@ public class CursorInputHandlerTests : N.Tests.Test
 
         var source = this.SpawnComponent<FakeSource>();
         source.DragCursor = this.SpawnBlank();
+        source.DragObject = true;
 
         var receiver = this.SpawnComponent<FakeReceiver>();
 

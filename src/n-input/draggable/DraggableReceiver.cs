@@ -11,21 +11,32 @@ namespace N.Package.Input.Draggable
     public class DraggableReceiver : DraggableBase, IDraggableReceiver
     {
         [Tooltip("Check if a draggable is valid for this receiver")]
-        public CheckSourceEvent isValid = new CheckSourceEvent();
+        public DraggableUnityEvent isValid = new DraggableUnityEvent();
 
         [Tooltip("Handle a draggalbe which is dropped on this receiver")]
-        public DraggableEvent onAccept = new DraggableEvent();
-
-        [Tooltip("Invoked if the draggable leaves this receiver.")]
-        public DraggableEvent onLeave = new DraggableEvent();
+        public DraggableUnityEvent onAccept = new DraggableUnityEvent();
 
         [Tooltip("Invoked if the draggable enters this receiver.")]
-        public EnterEvent onEnter = new EnterEvent();
+        public DraggableUnityEvent onEnter = new DraggableUnityEvent();
+
+        [Tooltip("Invoked if the draggable leaves this receiver.")]
+        public DraggableUnityEvent onLeave = new DraggableUnityEvent();
 
         /// Makes sure an instance exists on start
         public void Start()
         {
             Draggable.RequireManager();
+        }
+
+        /// Return arguments
+        private DraggableEvent Args(IDraggableSource source, bool accept)
+        {
+            return new DraggableEvent()
+            {
+                accept = accept,
+                source = source,
+                receiver = this
+            };
         }
 
         /// Receiver api
@@ -37,11 +48,9 @@ namespace N.Package.Input.Draggable
         {
             if (isValid.GetPersistentEventCount() > 0)
             {
-                var check = new DraggableIsValid();
-                check.source = draggable;
-                check.accept = false;
-                isValid.Invoke(check);
-                return check.accept;
+                var args = Args(draggable, false);
+                isValid.Invoke(args);
+                return args.accept;
             }
             return false;
         }
@@ -50,10 +59,7 @@ namespace N.Package.Input.Draggable
         {
             if (onEnter.GetPersistentEventCount() > 0)
             {
-                var enter = new DraggableEntered();
-                enter.source = draggable;
-                enter.valid = isValid;
-                onEnter.Invoke(enter);
+                onEnter.Invoke(Args(draggable, isValid));
             }
         }
 
@@ -61,7 +67,7 @@ namespace N.Package.Input.Draggable
         {
             if (onLeave.GetPersistentEventCount() > 0)
             {
-                onLeave.Invoke(draggable);
+                onLeave.Invoke(Args(draggable, false));
             }
         }
 
@@ -69,7 +75,7 @@ namespace N.Package.Input.Draggable
         {
             if (onAccept.GetPersistentEventCount() > 0)
             {
-                onAccept.Invoke(draggable);
+                onAccept.Invoke(Args(draggable, true));
             }
         }
     }
