@@ -34,6 +34,7 @@ namespace N.Package.Input.Draggable
             {
                 throw new System.Exception("Draggable manager must have a backing target set");
             }
+            referenceBacking.SetActive(true);
 
             // Setup handler
             inputHandler = new CursorInputHandler(referenceBacking);
