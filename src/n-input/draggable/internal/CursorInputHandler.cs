@@ -76,7 +76,7 @@ namespace N.Package.Input.Draggable.Internal
         {
             if (IsValidCursor(cursorId))
             {
-                pool.StopDragging(cursorId);
+                pool.StopDragging();
             }
         }
 
