@@ -19,7 +19,6 @@ public class BoxActor : Actor
     /// Execute an action on this actor
     public override void Trigger<TAction>(TAction action)
     {
-        _.Log(action);
         switch ((MyEventType)(object)action)
         {
             case MyEventType.START_FORWARDS:

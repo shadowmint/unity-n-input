@@ -7,39 +7,24 @@ public class LocalInputController : Controller
     public KeyCode left;
     public KeyCode right;
     public KeyCode forward;
+    private Binding<MyEventType> binding;
 
     public void Start()
     {
         Inputs.Default.Register(Devices.Keyboard);
+        binding = new Binding<MyEventType>(Inputs.Default);
+        binding.Bind(new KeyBinding<MyEventType>(left, MyEventType.START_TURN_LEFT, MyEventType.STOP_TURN_LEFT));
+        binding.Bind(new KeyBinding<MyEventType>(right, MyEventType.START_TURN_RIGHT, MyEventType.STOP_TURN_RIGHT));
+        binding.Bind(new KeyBinding<MyEventType>(forward, MyEventType.START_FORWARDS, MyEventType.STOP_FORWARDS));
     }
 
     public override IEnumerable<TAction> Actions<TAction>()
     {
-        foreach (var keys in Inputs.Default.Stream<Keys>())
+        if (typeof(TAction) == typeof(MyEventType))
         {
-            if (keys.down(left))
+            foreach (var action in binding.Actions())
             {
-                yield return (TAction)(object)MyEventType.START_TURN_LEFT;
-            }
-            if (keys.up(left))
-            {
-                yield return (TAction)(object)MyEventType.STOP_TURN_LEFT;
-            }
-            if (keys.down(right))
-            {
-                yield return (TAction)(object)MyEventType.START_TURN_RIGHT;
-            }
-            if (keys.up(right))
-            {
-                yield return (TAction)(object)MyEventType.STOP_TURN_RIGHT;
-            }
-            if (keys.down(forward))
-            {
-                yield return (TAction)(object)MyEventType.START_FORWARDS;
-            }
-            if (keys.up(forward))
-            {
-                yield return (TAction)(object)MyEventType.STOP_FORWARDS;
+                yield return (TAction)(object)action;
             }
         }
     }
