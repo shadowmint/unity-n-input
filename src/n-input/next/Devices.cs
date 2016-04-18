@@ -43,5 +43,16 @@ namespace N.Package.Input.Next
                 return mouse;
             }
         }
+
+        /// Clear all devices
+        /// eg. For new level is loaded
+        /// Notice this does not clear Inputs instances; use should use
+        /// Inputs.Clear() to clear before loading level, not this.
+        public static void Clear()
+        {
+            mouse = null;
+            keyboard = null;
+            inputId = 0;
+        }
     }
 }
