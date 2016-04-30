@@ -7,7 +7,7 @@ using N.Package.Input.Next.Draggable.Internal;
 namespace N.Package.Input.Next.Draggable
 {
     /// Makes it possible to drag a Draggable from the GameObject
-    [AddComponentMenu("N/Input/Draggable/Draggable Receiver")]
+    [AddComponentMenu("N/Input/Next/Draggable/Draggable Receiver")]
     public class DraggableReceiver : DraggableBase, IDraggableReceiver
     {
         [Tooltip("Check if a draggable is valid for this receiver")]

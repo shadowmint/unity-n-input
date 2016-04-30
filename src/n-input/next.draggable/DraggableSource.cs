@@ -7,7 +7,7 @@ using N.Package.Input.Next.Draggable.Internal;
 namespace N.Package.Input.Next.Draggable
 {
     /// Makes it possible to drag a Draggable from the GameObject
-    [AddComponentMenu("N/Input/Draggable/Draggable Source")]
+    [AddComponentMenu("N/Input/Next/Draggable/Draggable Source")]
     public class DraggableSource : DraggableBase, IDraggableSource
     {
         [Tooltip("When dragging, create an instance of this cursor icon on the cursor")]

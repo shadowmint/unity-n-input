@@ -30,6 +30,9 @@ namespace N.Package.Input.Next.Draggable
         /// The cursor input handler
         private CursorInputHandler inputHandler;
 
+        /// Hover tracker
+        private CursorHoverTracker hover;
+
         /// Currently down?
         private bool down;
 
@@ -42,6 +45,9 @@ namespace N.Package.Input.Next.Draggable
             }
             referenceBacking.SetActive(true);
 
+            // Setup hover tracker
+            hover = new CursorHoverTracker();
+
             // Setup handler
             inputHandler = new CursorInputHandler(referenceBacking);
             inputHandler.AcceptCursor(CodeForKeyCode(button));
@@ -52,39 +58,67 @@ namespace N.Package.Input.Next.Draggable
         // Process inputs
         public void Update()
         {
-            // Track button clicks
+            // Check if currently down?
+            bool isNowDown = false;
+            bool isNowUp = false;
             foreach (var buttons in Inputs.Default.Stream<Buttons>())
             {
-                if (buttons.down(button) && !down)
+                if (buttons.down(button))
+                {
+                    isNowDown = true;
+                    break;
+                }
+                else if (buttons.up(button) && down)
+                {
+                    isNowUp = true;
+                    break;
+                }
+            }
+
+            // Track button clicks
+            if (isNowDown || down)
+            {
+                hover.StartTracking();
+                if (!down)
                 {
                     foreach (var hit in CurrentDraggables())
                     {
                         down = true;
-                        inputHandler.CursorDown(CodeForKeyCode(button), hit);
+                        inputHandler.CursorDown(CodeForKeyCode(button), hit.gameObject);
+                        hover.Track(hit);
                     }
                 }
-                else if (buttons.up(button) && down)
+                else
                 {
-                    inputHandler.CursorUp(CodeForKeyCode(button));
-                    down = false;
+                    foreach (var hit in CurrentDraggables())
+                    {
+                        hover.Track(hit);
+                    }
+                }
+                hover.CompletedTracking();
+
+                // Entered a new target?
+                foreach (var item in hover.OverEvents)
+                {
+                    inputHandler.CursorEnter(item.gameObject);
+                }
+                foreach (var item in hover.OutEvents)
+                {
+                    inputHandler.CursorLeave(item.gameObject);
+                }
+
+                // Motion~
+                var motion = CurrentMotion();
+                if (motion.target != null)
+                {
+                    inputHandler.CursorMove(motion.target, motion.point);
                 }
             }
-
-            // Entered a new target?
-            // TODO: Handle these somehow?
-            /*
-            RawInput.Default.Events.AddEventHandler<CursorEnterEvent>((evp) =>
-            { inputHandler.CursorEnter(evp.target); });
-
-            RawInput.Default.Events.AddEventHandler<CursorLeaveEvent>((evp) =>
-            { inputHandler.CursorLeave(evp.target); });
-            */
-
-            // Motion~
-            var motion = CurrentMotion();
-            if (motion.target != null)
+            if (isNowUp && down)
             {
-                inputHandler.CursorMove(motion.target, motion.point);
+                inputHandler.CursorUp(CodeForKeyCode(button));
+                hover.Reset();
+                down = false;
             }
         }
 
@@ -101,7 +135,7 @@ namespace N.Package.Input.Next.Draggable
             return -1;
         }
 
-        /// Yield the set of intersections on the drag plane
+        /// Return the position on the reference backing
         private Hit CurrentMotion()
         {
             var rtn = new Hit() { target = null };
@@ -120,7 +154,7 @@ namespace N.Package.Input.Next.Draggable
         }
 
         /// Yield the set of draggable targets
-        private IEnumerable<GameObject> CurrentDraggables()
+        private IEnumerable<DraggableBase> CurrentDraggables()
         {
             foreach (var input in Inputs.Default.Stream<Collider3>())
             {
@@ -129,7 +163,7 @@ namespace N.Package.Input.Next.Draggable
                     var draggable = hit.target.GetComponent<DraggableBase>();
                     if (draggable != null)
                     {
-                        yield return hit.target;
+                        yield return draggable;
                     }
                 }
             }
