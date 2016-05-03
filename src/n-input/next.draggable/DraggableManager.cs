@@ -145,6 +145,7 @@ namespace N.Package.Input.Next.Draggable
                 {
                     if (hit.target == referenceBacking)
                     {
+                        // _.Log("Motion: {0}", rtn.point);
                         rtn = hit;
                         break;
                     }
@@ -163,6 +164,15 @@ namespace N.Package.Input.Next.Draggable
                     var draggable = hit.target.GetComponent<DraggableBase>();
                     if (draggable != null)
                     {
+                        var source = draggable.Source;
+                        if (source != null)
+                        {
+                            if (!source.IsDragging)
+                            {
+                                source.ClickOrigin = new Vector3(hit.point[0], hit.point[1], draggable.gameObject.transform.position[2]);
+                                source.ClickOffset = (source.ClickOrigin - draggable.gameObject.transform.position);
+                            }
+                        }
                         yield return draggable;
                     }
                 }

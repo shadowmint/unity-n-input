@@ -21,6 +21,15 @@ namespace N.Package.Input.Next.Helpers
         /// Set and get the total number of hits
         public int Count { get; set; }
 
+        /// Is this a 2D or 3D camera?
+        public bool UseRaycast2D
+        {
+            get
+            {
+                return camera.orthographic;
+            }
+        }
+
         /// Last update
         private int lastUpdate = 0;
 

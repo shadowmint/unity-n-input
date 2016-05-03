@@ -52,11 +52,11 @@ namespace N.Package.Input.Next.Draggable.Internal
         {
             if (cursor != null)
             {
-                cursor.transform.position = position + cursorOffset;
+                cursor.transform.position = position + cursorOffset - source.ClickOffset;
             }
             if (source.DragObject)
             {
-                source.GameObject.transform.position = position + objectOffset;
+                source.GameObject.transform.position = position + objectOffset - source.ClickOffset;
             }
         }
     }

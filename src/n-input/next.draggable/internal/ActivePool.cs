@@ -58,6 +58,7 @@ namespace N.Package.Input.Next.Draggable.Internal
         public void Release(ActiveObject active)
         {
             var count = active.ProcessReceivers();
+            active.source.IsDragging = false;
             if (count == 0)
             {
                 active.source.OnDragStop();  // Released with no receiver

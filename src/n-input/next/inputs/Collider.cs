@@ -20,13 +20,6 @@ namespace N.Package.Input.Next
         public float distance;
     }
 
-    /// Type of colliders
-    public enum ColliderType
-    {
-        Raycast2D,
-        Raycast3D
-    }
-
     /// API for world position where we intersect with objects
     /// eg. For raycast cursors, or 3d motion controllers
     public class Collider3 : IInput
@@ -42,9 +35,6 @@ namespace N.Package.Input.Next
         public IRaycastFactory Factory { get { return factory; } }
         private IRaycastFactory factory;
 
-        /// Is this a 2d or 3d collider?
-        public ColliderType type;
-
         /// Set of collected intersection points
         private Hit[] hits;
 
@@ -54,7 +44,7 @@ namespace N.Package.Input.Next
         /// Last update
         private int lastUpdate = 0;
 
-        public Collider3(int id, IRaycastFactory factory, ColliderType type = ColliderType.Raycast3D)
+        public Collider3(int id, IRaycastFactory factory)
         {
             count = 0;
             hits = new Hit[1];
@@ -98,14 +88,7 @@ namespace N.Package.Input.Next
         /// Return an array or null
         private IEnumerable<Hit> Raycast()
         {
-            switch (this.type)
-            {
-                case ColliderType.Raycast3D:
-                    return factory.Raycast();
-                case ColliderType.Raycast2D:
-                    return factory.Raycast2D();
-            }
-            return null;
+            return factory.Raycast();
         }
     }
 }

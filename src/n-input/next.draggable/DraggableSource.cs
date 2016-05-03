@@ -41,6 +41,7 @@ namespace N.Package.Input.Next.Draggable
         public void Start()
         {
             Draggable.RequireManager();
+            IsDragging = false;
         }
 
         /// Return arguments
@@ -65,11 +66,16 @@ namespace N.Package.Input.Next.Draggable
 
         public bool DragObject { get { return dragSelf; } }
 
+        public Vector3 ClickOrigin { get; set; }
+
+        public Vector3 ClickOffset { get; set; }
+
+        public bool IsDragging { get; set; }
+
         public bool CanDragStart()
         {
             if (canDragStart.GetPersistentEventCount() > 0)
             {
-
                 var args = Args(null, false);
                 canDragStart.Invoke(args);
                 return args.accept;

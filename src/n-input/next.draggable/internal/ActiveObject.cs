@@ -27,6 +27,7 @@ namespace N.Package.Input.Next.Draggable.Internal
         public ActiveObject(IDraggableSource source)
         {
             this.source = source;
+            this.source.IsDragging = true;
             display = new DisplayState(source);
             resolved = false;
         }

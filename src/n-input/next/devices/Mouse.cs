@@ -39,24 +39,6 @@ namespace N.Package.Input.Next
             return collider.Id;
         }
 
-        /// Add a 2d intersection cursor to this mouse
-        /// @param distance The raycast distance
-        /// @param camera The camera to use, to null for the default camera.
-        /// @param layerMask The raycast layer mask, defaults to the default mask.
-        /// Returns the id of the add input.
-        public int EnableRaycast2D(float distance, Camera camera = null, int layerMask = Physics.DefaultRaycastLayers)
-        {
-            var factory = new CameraRaycastFactory()
-            {
-                Distance = distance,
-                LayerMask = layerMask,
-                camera = camera ?? Camera.main
-            };
-            var collider = new Collider3(Devices.InputId, factory, ColliderType.Raycast2D);
-            rays.Add(collider);
-            return collider.Id;
-        }
-
         /// The set of inputs on this device
         public IEnumerable<IInput> Inputs
         {

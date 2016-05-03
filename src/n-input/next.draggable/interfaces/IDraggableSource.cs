@@ -17,6 +17,15 @@ namespace N.Package.Input.Next.Draggable
         /// Return the primary game object for this
         GameObject GameObject { get; }
 
+        /// The point where the very first click was made
+        Vector3 ClickOrigin { get; set; }
+
+        /// The relative offset to the first click
+        Vector3 ClickOffset { get; set; }
+
+        /// Return true if the object is currently being dragged
+        bool IsDragging { get; set; }
+
         /// Is this still a valid draggable?
         /// Sometimes dragging objects into specific places automatically 'drops' them.
         /// This is set to true if CanDragStart return true; if it set false later,
