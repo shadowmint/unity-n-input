@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using N.Package.Input.Next.Helpers;
 using UnityEngine;
+using UE = UnityEngine;
 
 namespace N.Package.Input.Next
 {
@@ -26,13 +27,13 @@ namespace N.Package.Input.Next
         /// @param camera The camera to use, to null for the default camera.
         /// @param layerMask The raycast layer mask, defaults to the default mask.
         /// Returns the id of the add input.
-        public int EnableRaycast(float distance, Camera camera = null, int layerMask = Physics.DefaultRaycastLayers)
+        public int EnableRaycast(float distance, UE.Camera camera = null, int layerMask = Physics.DefaultRaycastLayers)
         {
             var factory = new CameraRaycastFactory()
             {
                 Distance = distance,
                 LayerMask = layerMask,
-                camera = camera ?? Camera.main
+                camera = camera ?? UE.Camera.main
             };
             var collider = new Collider3(Devices.InputId, factory);
             rays.Add(collider);

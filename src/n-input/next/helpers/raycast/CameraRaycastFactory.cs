@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using UE = UnityEngine;
 
 namespace N.Package.Input.Next.Helpers
 {
@@ -7,7 +8,7 @@ namespace N.Package.Input.Next.Helpers
     public class CameraRaycastFactory : IRaycastFactory
     {
         /// Camera to raycast from
-        public Camera camera;
+        public UE.Camera camera;
 
         /// Return the distance
         public float Distance { get; set; }
