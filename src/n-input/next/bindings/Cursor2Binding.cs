@@ -8,6 +8,7 @@ namespace N.Package.Input.Next
     {
         private TAction enter;
         private TAction leave;
+        private TAction motion;
         private Rect bounds;
         private bool active;
 
@@ -18,11 +19,13 @@ namespace N.Package.Input.Next
         /// @param max The maximum edge of this region.
         /// @param enter The event to emit when entering the zone.
         /// @param leave The event to emit when leaving the zone.
-        public Cursor2Binding(Vector2 min, Vector2 max, TAction enter, TAction leave)
+        /// @param motion The event every frame if the position changes.
+        public Cursor2Binding(Vector2 min, Vector2 max, TAction enter, TAction leave, TAction motion)
         {
             this.bounds = new Rect(min, max - min);
             this.enter = enter;
             this.leave = leave;
+            this.motion = motion;
             active = false;
         }
 
@@ -31,6 +34,7 @@ namespace N.Package.Input.Next
             var cursor = input as Cursor2;
             if (cursor != null)
             {
+                yield return motion;
                 var point = cursor.Position;
                 if (!active && bounds.Contains(point))
                 {

@@ -16,12 +16,24 @@ namespace N.Package.Input.Next
         /// A hook for a 3d intersecting cursor
         private IList<Collider3> rays = new List<Collider3>();
 
+        /// A hook for scaled 2d positional offsets
+        private IList<NCursor2> normalized = new List<NCursor2>();
+
         public Mouse()
         {
             cursor = new Cursor2(Devices.InputId);
             buttons = new Buttons(Devices.InputId);
         }
 
+        /// Add a normalized cursor2 binding to a specific camera
+        public int EnableNormalizedCursor2(UE.Camera camera)
+        {
+            var cursor = new NCursor2(Devices.InputId, camera);
+            normalized.Add(cursor);
+            return cursor.Id;
+        }
+
+        /// Add a specific camera to generate a Cursor2
         /// Add a 3d intersection cursor to this mouse
         /// @param distance The raycast distance
         /// @param camera The camera to use, to null for the default camera.
@@ -57,6 +69,12 @@ namespace N.Package.Input.Next
                     var factory = (collider.Factory as CameraRaycastFactory);
                     factory.Update(cursor);
                     yield return collider;
+                }
+
+                // Normalized
+                foreach (var scaled in normalized)
+                {
+                    yield return scaled;
                 }
             }
         }

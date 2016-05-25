@@ -18,6 +18,12 @@ other bindings which can be swapped in and out.
 To bind a game object to a controller, assign the controller to the
 Actor object.
 
+### Event types
+
+The event type TAction which is assigned to a binding can be anything;
+but if it *does* implement IAction, it will be passed the input to `Configure`
+to configure itself.
+
 ### Controllers
 
 Controllers are invoked by the Actor when the Actor calls 'TriggerPending()';

@@ -19,6 +19,11 @@ namespace N.Package.Input.Next
         /// Generate the next set of input actions
         public abstract IEnumerable<TAction> Actions<TAction>();
 
+        /// Override this to get notification that a new actor is using this controller
+        public virtual void OnActorAttached(Actor actor)
+        {
+        }
+
         /// Update position and rotation
         public void Update()
         {

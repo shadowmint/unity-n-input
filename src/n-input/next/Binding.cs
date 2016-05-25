@@ -42,7 +42,15 @@ namespace N.Package.Input.Next
                 {
                     foreach (var action in binding.Actions(input))
                     {
-                        yield return action;
+                        if (action != null)
+                        {
+                            var asAction = action as IAction;
+                            if (asAction != null)
+                            {
+                                asAction.Configure(input);
+                            }
+                            yield return action;
+                        }
                     }
                 }
             }
