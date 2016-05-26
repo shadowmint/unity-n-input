@@ -6,10 +6,13 @@ namespace N.Package.Input.Next.Templates.FPS
     public class FPSController : Controller
     {
         [Tooltip("The FPS Camera we're using, if any")]
-        public new FPSCamera cameraFPS;
+        public FPSCamera FPSCamera;
 
         [Tooltip("Invert look")]
         public bool invertLook = false;
+
+        [Tooltip("Keybindings")]
+        public FPSKeyBindings keyBindings = new FPSKeyBindings();
 
         // Event mapper
         private Binding<FPSAction> binding;
@@ -20,18 +23,27 @@ namespace N.Package.Input.Next.Templates.FPS
             var mouse = Devices.Mouse;
             mouse.EnableNormalizedCursor2(UnityEngine.Camera.main);
             Inputs.Default.Register(mouse);
+            Inputs.Default.Register(Devices.Keyboard);
 
-            // Inputs
+            // Inputs: Mouse
             binding = new Binding<FPSAction>(Inputs.Default);
             binding.Bind(new Cursor2Binding<FPSAction>(new Vector2(0f, 0f), new Vector2(1f, 1f), null, null, new FPSLookAtEvent()));
+
+            // Inputs: Keyboard
+            binding.Bind(new KeyBinding<FPSAction>(keyBindings.forwards, new FPSMoveEvent(FPSMotion.FORWARDS, true), new FPSMoveEvent(FPSMotion.FORWARDS, false)));
+            binding.Bind(new KeyBinding<FPSAction>(keyBindings.backwards, new FPSMoveEvent(FPSMotion.BACKWARDS, true), new FPSMoveEvent(FPSMotion.BACKWARDS, false)));
+            binding.Bind(new KeyBinding<FPSAction>(keyBindings.left, new FPSMoveEvent(FPSMotion.LEFT, true), new FPSMoveEvent(FPSMotion.LEFT, false)));
+            binding.Bind(new KeyBinding<FPSAction>(keyBindings.right, new FPSMoveEvent(FPSMotion.RIGHT, true), new FPSMoveEvent(FPSMotion.RIGHT, false)));
+            binding.Bind(new KeyBinding<FPSAction>(keyBindings.turnLeft, new FPSMoveEvent(FPSMotion.TURN_LEFT, true), new FPSMoveEvent(FPSMotion.TURN_LEFT, false)));
+            binding.Bind(new KeyBinding<FPSAction>(keyBindings.turnRight, new FPSMoveEvent(FPSMotion.TURN_RIGHT, true), new FPSMoveEvent(FPSMotion.TURN_RIGHT, false)));
         }
 
         /// When an actor is bound, bind the FPS camera to it
         public override void OnActorAttached(Actor actor)
         {
-            if (cameraFPS != null)
+            if (FPSCamera != null)
             {
-                cameraFPS.target = (actor as FPSActor).head;
+                FPSCamera.target = (actor as FPSActor).head;
             }
         }
 
@@ -55,5 +67,16 @@ namespace N.Package.Input.Next.Templates.FPS
                 action.point.y *= -1.0f;
             }
         }
+    }
+
+    [System.Serializable]
+    public class FPSKeyBindings
+    {
+        public KeyCode forwards = KeyCode.W;
+        public KeyCode backwards = KeyCode.S;
+        public KeyCode left = KeyCode.Q;
+        public KeyCode right = KeyCode.E;
+        public KeyCode turnLeft = KeyCode.A;
+        public KeyCode turnRight = KeyCode.D;
     }
 }

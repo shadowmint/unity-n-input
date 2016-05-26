@@ -21,4 +21,22 @@ namespace N.Package.Input.Next.Templates.FPS
             }
         }
     }
+
+    /// Move event type
+    public class FPSMoveEvent : FPSAction
+    {
+        /// What action is this?
+        public FPSMotion code;
+
+        /// Is this action active
+        public bool active;
+
+        public FPSMoveEvent(FPSMotion code, bool active)
+        {
+            this.code = code;
+            this.active = active;
+        }
+
+        public override void Configure(IInput input) {}
+    }
 }
