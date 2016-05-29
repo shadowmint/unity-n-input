@@ -36,6 +36,7 @@ namespace N.Package.Input.Next.Templates.FPS
             binding.Bind(new KeyBinding<FPSAction>(keyBindings.right, new FPSMoveEvent(FPSMotion.RIGHT, true), new FPSMoveEvent(FPSMotion.RIGHT, false)));
             binding.Bind(new KeyBinding<FPSAction>(keyBindings.turnLeft, new FPSMoveEvent(FPSMotion.TURN_LEFT, true), new FPSMoveEvent(FPSMotion.TURN_LEFT, false)));
             binding.Bind(new KeyBinding<FPSAction>(keyBindings.turnRight, new FPSMoveEvent(FPSMotion.TURN_RIGHT, true), new FPSMoveEvent(FPSMotion.TURN_RIGHT, false)));
+            binding.Bind(new KeyBinding<FPSAction>(keyBindings.jump, new FPSMoveEvent(FPSMotion.JUMP, true), new FPSMoveEvent(FPSMotion.JUMP, false)));
         }
 
         /// When an actor is bound, bind the FPS camera to it
@@ -74,9 +75,10 @@ namespace N.Package.Input.Next.Templates.FPS
     {
         public KeyCode forwards = KeyCode.W;
         public KeyCode backwards = KeyCode.S;
-        public KeyCode left = KeyCode.Q;
-        public KeyCode right = KeyCode.E;
-        public KeyCode turnLeft = KeyCode.A;
-        public KeyCode turnRight = KeyCode.D;
+        public KeyCode left = KeyCode.A;
+        public KeyCode right = KeyCode.D;
+        public KeyCode turnLeft = KeyCode.Q;
+        public KeyCode turnRight = KeyCode.E;
+        public KeyCode jump = KeyCode.Space;
     }
 }
