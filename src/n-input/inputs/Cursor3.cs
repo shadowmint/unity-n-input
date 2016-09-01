@@ -6,12 +6,14 @@ namespace N.Package.Input
   /// API for world position
   public class Cursor3 : IInput
   {
-    protected int id;
+    private readonly int _id;
 
     public int Id
     {
-      get { return id; }
+      get { return _id; }
     }
+
+    public IDevice Device { get; set; }
 
     /// World position
     public Vector3 Position
@@ -21,7 +23,7 @@ namespace N.Package.Input
 
     public Cursor3(int id)
     {
-      this.id = id;
+      this._id = id;
     }
   }
 }

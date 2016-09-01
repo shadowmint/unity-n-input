@@ -38,12 +38,13 @@ namespace N.Package.Input
             {
                 foreach (var input in device.Inputs)
                 {
+                    input.Device = device;
                     yield return input;
                 }
             }
         }
 
-        /// Yield all inputs from target
+        /// Yield all inputs that are TInput
         public IEnumerable<TInput> Stream<TInput>() where TInput : class, IInput
         {
             foreach (var device in devices)
@@ -52,15 +53,12 @@ namespace N.Package.Input
                 {
                     if (input is TInput)
                     {
+                        input.Device = device;
                         yield return input as TInput;
                     }
                 }
             }
-        }
-
-        /// Yield all inputs that are TInput
-
-        /// Yield all inputs that are TInput from target
+        }     
 
         /// Clear all devices, eg. for a level load
         public void Clear()

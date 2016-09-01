@@ -5,16 +5,18 @@ namespace N.Package.Input
   /// A generic buttons interaction api
   public class Buttons : IInput
   {
-    private int id;
+    private readonly int _id;
 
     public int Id
     {
-      get { return id; }
+      get { return _id; }
     }
+
+    public IDevice Device { get; set; }
 
     public Buttons(int id)
     {
-      this.id = id;
+      _id = id;
     }
 
     public bool Down(KeyCode key)
