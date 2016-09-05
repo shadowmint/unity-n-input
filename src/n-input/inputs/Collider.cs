@@ -24,14 +24,12 @@ namespace N.Package.Input
   /// eg. For raycast cursors, or 3d motion controllers
   public class Collider3 : IInput
   {
-    private readonly int _id;
+    protected int id;
 
     public int Id
     {
-      get { return _id; }
+      get { return id; }
     }
-
-    public IDevice Device { get; set; }
 
     /// The factory to raycast with
     public IRaycastFactory Factory
@@ -54,7 +52,7 @@ namespace N.Package.Input
     {
       count = 0;
       hits = new Hit[1];
-      _id = id;
+      this.id = id;
       this.factory = factory;
     }
 

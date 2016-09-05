@@ -7,8 +7,5 @@ namespace N.Package.Input
     /// Return some unique id for this instance
     /// eg. Finger id for multitouch
     int Id { get; }
-
-    /// The parent device this input is associated with
-    IDevice Device { get; set; }
   }
 }

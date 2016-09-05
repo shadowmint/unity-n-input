@@ -5,14 +5,12 @@ namespace N.Package.Input
   /// API for mouse position
   public class Cursor2 : IInput
   {
-    private readonly int _id;
+    private int id;
 
     public int Id
     {
-      get { return _id; }
+      get { return id; }
     }
-
-    public IDevice Device { get; set; }
 
     /// Screen position
     public virtual Vector2 Position
@@ -22,7 +20,7 @@ namespace N.Package.Input
 
     public Cursor2(int id)
     {
-      this._id = id;
+      this.id = id;
     }
   }
 

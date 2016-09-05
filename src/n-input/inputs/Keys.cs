@@ -5,18 +5,16 @@ namespace N.Package.Input
   /// API to check for the state of various key codes
   public class Keys : IInput
   {
-    private readonly int _id;
+    private int id;
 
     public int Id
     {
-      get { return _id; }
+      get { return id; }
     }
-
-    public IDevice Device { get; set; }
 
     public Keys(int id)
     {
-      this._id = id;
+      this.id = id;
     }
 
     public bool down(KeyCode key)
