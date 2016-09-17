@@ -134,9 +134,9 @@ namespace N.Package.Input.Templates.FPS
       }
     }
 
-    public void Update()
+    public override void Update()
     {
-      this.TriggerPending<FPSAction>();
+      TriggerPending<FPSAction>();
       motion.Update(rbody);
     }
   }
