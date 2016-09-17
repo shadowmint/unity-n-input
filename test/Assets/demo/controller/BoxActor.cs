@@ -42,7 +42,7 @@ public class BoxActor : Actor
         }
     }
 
-    public void Update()
+    public override void Update()
     {
         // Trigger events
         this.TriggerPending<MyEventType>();
