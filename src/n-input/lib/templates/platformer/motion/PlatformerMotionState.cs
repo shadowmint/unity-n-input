@@ -43,6 +43,8 @@ namespace N.Package.Input.Templates.Platformer
     /// How long has a particular direction arrow been held down?
     private float _directionTime = 0;
 
+    /// Should direction time be reset?
+    private bool _directionTimeLock = true;
     /// What was the last lateral motion we saw?
     private PlatformerMotion _lastLateralMotion;
 
@@ -88,7 +90,10 @@ namespace N.Package.Input.Templates.Platformer
       if (_lastLateralMotion != LateralMotion)
       {
         _lastLateralMotion = LateralMotion;
-        _directionTime = 0f;
+        if (_directionTimeLock)
+        {
+          _directionTime = 0f;
+        }
       }
       else
       {
@@ -130,6 +135,17 @@ namespace N.Package.Input.Templates.Platformer
       var newComponent = Vector3.Project(speed, direction);
       var oldVelocity = body.velocity;
       body.velocity = oldVelocity - (Vector2) oldComponent + (Vector2) newComponent;
+    }
+
+    public void SetSpeedFactor(float factor)
+    {
+      _directionTime = TimeToMaxSpeed * Mathf.Clamp(factor, 0f, 1f);
+      _directionTimeLock = false;
+    }
+
+    public void ResetSpeedFactor()
+    {
+      _directionTimeLock = true;
     }
   }
 }
