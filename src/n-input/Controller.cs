@@ -22,6 +22,9 @@ namespace N.Package.Input
     /// Associate an actor by assigning the controller component on it.
     private Actor _actor;
 
+    /// Is this controller currently attached?
+    private bool _attached;
+
     /// Generate the next set of input actions
     public abstract IEnumerable<TAction> Actions<TAction>();
 
@@ -30,6 +33,7 @@ namespace N.Package.Input
     {
       _actor = actor;
       actor.Controller = this;
+      _attached = true;
       OnActorAttached(actor);
     }
 
@@ -38,10 +42,23 @@ namespace N.Package.Input
     {
     }
 
+    /// Override this to get notification that a new actor is using this controller
+    public virtual void OnActorDetached()
+    {
+    }
+
     /// Update position and rotation
     public void Update()
     {
-      if (_actor == null) return;
+      if (_actor == null)
+      {
+        if (_attached)
+        {
+          _attached = false;
+          OnActorDetached();
+        }
+        return;
+      }
 
       if (followActorPosition)
       {
