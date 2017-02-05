@@ -28,6 +28,8 @@ namespace N.Package.Input.Controllers
     {
       var axis = input as InputAxis2D;
       if (axis == null) yield break;
+      if (axis.DeviceId != _controller.DeviceId) yield break;
+      _change.Axis = axis.GetValue();
 
       // ... ?
     }
