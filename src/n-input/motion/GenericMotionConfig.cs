@@ -28,6 +28,10 @@ namespace N.Package.Input.Motion
     public GameObject GroundDetectionPoint;
     public int GroundCollisionMask = -1;
 
+    // Special cases
+    [Tooltip("Set to false to allow objects to override kinematic state")]
+    public bool ForceObjecToBeNonKinematic = true;
+
     public Vector3 Forward(Rigidbody body)
     {
       return BestTransform(body).forward;

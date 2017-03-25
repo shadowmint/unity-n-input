@@ -49,7 +49,7 @@ namespace N.Package.Input.Motion
     // Perform all every frame checks
     private void Configure(Rigidbody body)
     {
-      if (body.isKinematic)
+      if (Config.ForceObjecToBeNonKinematic && body.isKinematic)
       {
         body.isKinematic = false;
       }
