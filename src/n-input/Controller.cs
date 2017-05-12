@@ -1,80 +1,80 @@
-using System.Collections.Generic;
+﻿using System.Linq;
+using N.Package.Input.Events;
 using UnityEngine;
 
 namespace N.Package.Input
 {
-  /// An event stream generates TAction instances from some source.
-  /// eg. Local input, remote input, AI
-  public abstract class Controller : MonoBehaviour
+  /// The controller is responsible for assigning the IInputDevice that an actor should be using.
+  public class Controller : MonoBehaviour
   {
-    [Tooltip("Follow actor position on any axis?")]
-    public bool followActorPosition = true;
+    [Tooltip("Assign an actor here to bind this controller to it")]
+    public Actor Actor;
 
-    [Tooltip("Follow actor rotation on any axis?")]
-    public bool followActorRotation = false;
+    [Tooltip("Assign an input here to bind this controller to it")]
+    public VirtualDevice Device;
 
-    public Actor Actor
-    {
-      get { return _actor; }
-    }
+    [Tooltip("A list of all active devices which could be found")]
+    public VirtualDevice[] AvailableDevices;
 
-    /// The actor associated with this controller.
-    /// Associate an actor by assigning the controller component on it.
+    [Tooltip("Update the list of available devices this often")]
+    public float InputScanInterval = 1f;
+
+    private float _elapsed;
+
     private Actor _actor;
 
-    /// Is this controller currently attached?
-    private bool _attached;
+    private VirtualDevice _device;
 
-    /// Generate the next set of input actions
-    public abstract IEnumerable<TAction> Actions<TAction>();
-
-    /// Attach an actor to this controller
-    public void Bind(Actor actor)
+    public void Awake()
     {
-      _actor = actor;
-      actor.Controller = this;
-      _attached = true;
-      OnActorAttached(actor);
+      _elapsed = InputScanInterval + 1f;
+      UpdateDeviceList();
     }
 
-    /// Override this to get notification that a new actor is using this controller
-    public virtual void OnActorAttached(Actor actor)
-    {
-    }
-
-    /// Override this to get notification that a new actor is using this controller
-    public virtual void OnActorDetached()
-    {
-    }
-
-    /// Update position and rotation
     public void Update()
     {
-      if (_actor == null)
+      if (_actor != Actor)
       {
-        if (_attached)
-        {
-          _attached = false;
-          OnActorDetached();
-        }
-        return;
+        DetachActor();
+        AttachActor(Actor);
       }
+      if (_device != Device)
+      {
+        BindInputToActor();
+      }
+      UpdateDeviceList();
+    }
 
-      if (followActorPosition)
-      {
-        if (transform.position != _actor.transform.position)
-        {
-          transform.position = _actor.transform.position;
-        }
-      }
+    private void UpdateDeviceList()
+    {
+      _elapsed += Time.deltaTime;
+      if (_elapsed < InputScanInterval) return;
+      _elapsed = 0f;
+      AvailableDevices = GetComponentsInChildren<VirtualDevice>().Where(i => i.Active).ToArray();
+    }
 
-      if (followActorRotation)
-      {
-        if (transform.rotation != _actor.transform.rotation)
-        {
-          transform.rotation = _actor.transform.rotation;
-        }
-      }
+    private void BindInputToActor()
+    {
+      if (_actor == null) return;
+      _device = Device;
+      _actor.EventHandler.Trigger(new DeviceChangedEvent() {Device = Device});
+    }
+
+    private void AttachActor(Actor actor)
+    {
+      if (actor == null) return;
+      _actor = actor;
+      _actor.EventHandler.Trigger(new ControllerChangedEvent() {Controller = this, Actor = actor});
+      Actors.EventHandler.Trigger(new ControllerChangedEvent() {Controller = this, Actor = actor});
+    }
+
+    private void DetachActor()
+    {
+      if (_actor == null) return;
+      _actor.EventHandler.Trigger(new ControllerChangedEvent() {Controller = null, Actor = _actor});
+      Actors.EventHandler.Trigger(new ControllerChangedEvent() {Controller = this, Actor = _actor});
+      _actor = null;
+      _device = null;
     }
   }
 }
