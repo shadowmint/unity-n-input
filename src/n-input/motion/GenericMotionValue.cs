@@ -27,9 +27,31 @@ namespace N.Package.Input.Motion
       return Mathf.Max(Mathf.Abs(Vertical), Mathf.Abs(Horizontal));
     }
 
+    public Vector3 AsVector(object body, GenericMotionConfig config)
+    {
+      var rb = body as Rigidbody;
+      if (rb != null)
+      {
+        return (config.Forward(rb) * Vertical + config.Right(rb) * Horizontal).normalized;  
+      }
+
+      var rb2d = body as Rigidbody2D;
+      if (rb2d != null)
+      {
+        return (config.Forward(rb2d) * Vertical + config.Right(rb2d) * Horizontal).normalized;  
+      }
+
+      return Vector3.zero;
+    } 
+    
     public Vector3 AsVector(Rigidbody body, GenericMotionConfig config)
     {
       return (config.Forward(body) * Vertical + config.Right(body) * Horizontal).normalized;
+    }
+    
+    public Vector3 AsVector(Rigidbody2D body, GenericMotionConfig config)
+    {
+      return (config.Right(body) * Horizontal).normalized;
     }
 
     public GenericMotionValue Clone()

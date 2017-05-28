@@ -7,7 +7,7 @@ namespace N.Package.Input.Motion
   /// GenericMotionTracker tracks events and fires events actor when motion changes.
   public class GenericMotionTracker
   {
-    private readonly GenericMotion _motion;
+    private readonly IGenericMotion _motion;
     private readonly EventHandler _eventHandler;
     private GenericMotionValue _direction;
     private bool _isFalling;
@@ -15,19 +15,30 @@ namespace N.Package.Input.Motion
 
     private const float MinValueThreshold = 0.01f;
 
-    public GenericMotionTracker(GenericMotion motion, EventHandler eventHandler)
+    public GenericMotionTracker(IGenericMotion motion, EventHandler eventHandler)
     {
       _motion = motion;
       _eventHandler = eventHandler;
       _direction = new GenericMotionValue();
     }
 
+    public void Update(Rigidbody2D body, GenericMotionConfig config)
+    {
+      Process(body, config);
+    }
+
     public void Update(Rigidbody body, GenericMotionConfig config)
     {
+      Process(body, config);
+    }
+
+    private void Process(object body, GenericMotionConfig config)
+    {
       var sendEvent = false;
-      var direction = _motion.State.Direction;
-      var isJumping = _motion.State.Jumping;
-      var isFalling = _motion.State.Falling;
+      var state = _motion.GetState();
+      var direction = state.GetDirection();
+      var isJumping = state.GetJumping();
+      var isFalling = state.GetFalling();
 
       // Check if we need to send an event?
       if ((_isFalling && !isFalling) || (!_isFalling && isFalling))

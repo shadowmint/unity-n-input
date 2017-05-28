@@ -8,6 +8,8 @@ namespace N.Package.Input
   {
     private readonly EventHandler _eventHandler = new EventHandler();
 
+    public Camera Camera { get; set; }
+
     public EventHandler EventHandler
     {
       get { return _eventHandler; }

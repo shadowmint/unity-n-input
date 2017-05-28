@@ -1,13 +1,11 @@
 ﻿using System.Linq;
-using System.Runtime.Serialization.Formatters;
 using UnityEngine;
-using Random = N.Package.Core.Random;
 
 namespace N.Package.Input.Motion
 {
   /// The current motion information
   [System.Serializable]
-  public class GenericMotionState : IGenericMotionState
+  public class GenericMotionState2D : IGenericMotionState
   {
     [Range(0, 2)]
     public float SpeedMultiplier = 1.0f;
@@ -23,7 +21,7 @@ namespace N.Package.Input.Motion
 
     private const float MinimumVelocityTheshold = 0.01f;
 
-    public void Update(GenericMotionConfig config, Rigidbody body)
+    public void Update(GenericMotionConfig config, Rigidbody2D body)
     {
       UpdateCurrentState(config, body);
 
@@ -35,7 +33,7 @@ namespace N.Package.Input.Motion
       Velocity += delta;
 
       // Convery velocity into force to apply.
-      current = body.velocity - Vector3.Project(body.velocity, config.Up(body));
+      current = body.velocity - Project(body.velocity, config.Up(body));
       target = Velocity - current;
       Force = target.magnitude * target.magnitude * target.normalized * body.mass;
 
@@ -58,6 +56,14 @@ namespace N.Package.Input.Motion
       HaltMinimumVelocities();
     }
 
+    /// Project a in direction of b
+    private static Vector2 Project(Vector2 a, Vector2 b)
+    {
+      var direction = b.normalized;
+      var magnitude = Vector2.Dot(a, direction);
+      return magnitude * direction;
+    }
+
     private void HaltMinimumVelocities()
     {
       if (Mathf.Abs(Velocity.x) < MinimumVelocityTheshold)
@@ -74,7 +80,7 @@ namespace N.Package.Input.Motion
       }
     }
 
-    private void UpdateCurrentState(GenericMotionConfig config, Rigidbody body)
+    private void UpdateCurrentState(GenericMotionConfig config, Rigidbody2D body)
     {
       if (Grounded)
       {
@@ -90,21 +96,28 @@ namespace N.Package.Input.Motion
       }
     }
 
-    private void DetectGround(GenericMotionConfig config, Rigidbody body)
+    private void DetectGround(GenericMotionConfig config, Rigidbody2D body)
     {
       if (!config.EnableGroundDetection) return;
       var root = config.GroundDetectionPoint != null ? config.GroundDetectionPoint : body.gameObject;
-      var hits = Physics.RaycastAll(root.transform.position, -config.Up(body), config.GroundDetectionDistance,
+      var hits = Physics2D.RaycastAll(root.transform.position, -config.Up(body), config.GroundDetectionDistance,
         config.GroundCollisionMask);
       Grounded = hits.Any(i => i.collider.gameObject != body.gameObject);
     }
 
-    public void Apply(Rigidbody body)
+    public void Apply(Rigidbody2D body)
     {
-      body.AddForce(Force, ForceMode.Force);
-      body.AddForce(Impulse, ForceMode.Impulse);
+      body.AddForce(Force, ForceMode2D.Force);
+      body.AddForce(Impulse, ForceMode2D.Impulse);
       Impulse = Vector3.zero;
       Force = Vector3.zero;
+    }
+
+    /// Shift the camera by the vertical offset
+    public void Apply(InputShiftableCamera camera)
+    {
+      if (camera == null) return;
+      camera.Value = Direction.Vertical;
     }
 
     public GenericMotionValue GetDirection()

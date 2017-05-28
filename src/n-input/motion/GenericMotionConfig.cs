@@ -36,18 +36,38 @@ namespace N.Package.Input.Motion
     {
       return BestTransform(body).forward;
     }
+    
+    public Vector3 Forward(Rigidbody2D body)
+    {
+      return BestTransform(body).forward;
+    }
 
     public Vector3 Right(Rigidbody body)
     {
       return BestTransform(body).right;
     }
 
+    public Vector3 Right(Rigidbody2D body)
+    {
+      return BestTransform(body).right;
+    }
+    
     public Vector3 Up(Rigidbody body)
+    {
+      return BestTransform(body).up;
+    }
+    
+    public Vector3 Up(Rigidbody2D body)
     {
       return BestTransform(body).up;
     }
 
     private Transform BestTransform(Rigidbody body)
+    {
+      return Directions == null ? body.transform : Directions.transform;
+    }
+    
+    private Transform BestTransform(Rigidbody2D body)
     {
       return Directions == null ? body.transform : Directions.transform;
     }
