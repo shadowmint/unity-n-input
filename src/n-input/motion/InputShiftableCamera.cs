@@ -27,16 +27,22 @@ namespace N.Package.Input.Motion
     }
 
     private void UpdatePosition()
-    {
+    {      
       var delta = (_target - Offset);
       if (delta.magnitude < FloatThreshold)
       {
         Offset = _target;
         return;
       }
+      
+      var shiftMagnitude = Speed * Time.deltaTime;
+      if (delta.magnitude < shiftMagnitude)
+      {
+        shiftMagnitude = delta.magnitude;
+      }
 
       var direction = delta.normalized;
-      var step = direction * Speed * Time.deltaTime;
+      var step = direction * shiftMagnitude;
       Offset += step;
     }
 
