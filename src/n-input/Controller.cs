@@ -56,8 +56,13 @@ namespace N.Package.Input
     private void BindInputToActor()
     {
       if (_actor == null) return;
+      if (_device != null)
+      {
+        _device.OnActorDetached();
+      }
       _device = Device;
       _actor.EventHandler.Trigger(new DeviceChangedEvent() {Device = Device});
+      _device.OnActorAttached(_actor);
     }
 
     private void AttachActor(Actor actor)

@@ -27,13 +27,13 @@ namespace N.Package.Input.Templates.Isometric
     {
       if (_device == null) return;
 
-      // Next motion state
+      // Next motion displayState
       _value.Horizontal = _device.State.Horizontal;
       _value.Vertical = _device.State.Vertical;
       Motion.State.Jumping = _device.State.Jump;
       _device.State.Jump = false;
 
-      // Update motion state
+      // Update motion displayState
       Motion.Motion(_value);
       Motion.Update(_body);
     }
