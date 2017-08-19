@@ -39,7 +39,7 @@ namespace N.Package.Input.Motion
       var direction = state.GetDirection();
       var isJumping = state.GetJumping();
       var isFalling = state.GetFalling();
-
+      
       // Check if we need to send an event?
       if ((_isFalling && !isFalling) || (!_isFalling && isFalling))
       {

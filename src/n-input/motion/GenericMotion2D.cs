@@ -32,10 +32,10 @@ namespace N.Package.Input.Motion
     public void Update(Rigidbody2D body, Camera camera)
     {
       Configure(body, camera);
+      UpdateTracker(body);
       State.Update(Config, body);
       State.Apply(_shiftCamera);
       State.Apply(body);
-      UpdateTracker(body);
     }
 
     public IGenericMotionState GetState()
