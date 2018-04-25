@@ -8,19 +8,21 @@ using EventHandler = N.Package.Events.EventHandler;
 namespace N.Package.Input.Motion
 {
   [System.Serializable]
-  public class GenericMotion2D : IGenericMotion
+  public class GenericMotion : IGenericMotion
   {
     public GenericMotionConfig Config;
-    public GenericMotionState2D State;
+    
+    public GenericMotionState State;
+    
     private GenericMotionTracker _tracker;
-    private InputShiftableCamera _shiftCamera;
+    
     private readonly EventHandler _events = new EventHandler();
+    
     private bool _initialized;
 
     public GenericMotionTracker Tracker
     {
       get { return _tracker ?? (_tracker = new GenericMotionTracker(this, _events)); }
-      set { _tracker = value; }
     }
 
     public void Motion(GenericMotionValue value)
@@ -29,13 +31,12 @@ namespace N.Package.Input.Motion
       State.Direction.Vertical = value.Vertical;
     }
 
-    public void Update(Rigidbody2D body, Camera camera)
+    public void Update(Rigidbody body)
     {
-      Configure(body, camera);
-      UpdateTracker(body);
+      Configure(body);
       State.Update(Config, body);
-      State.Apply(_shiftCamera);
       State.Apply(body);
+      UpdateTracker(body);
     }
 
     public IGenericMotionState GetState()
@@ -45,7 +46,7 @@ namespace N.Package.Input.Motion
     
     // Update the motion tracker; the tracker watches for large changes in motion and notifies.
     // eg. change in direction.
-    private void UpdateTracker(Rigidbody2D body)
+    private void UpdateTracker(Rigidbody body)
     {
       if (_tracker != null)
       {
@@ -54,29 +55,27 @@ namespace N.Package.Input.Motion
     }
 
     // Perform all every frame checks
-    private void Configure(Rigidbody2D body, Camera camera)
+    private void Configure(Rigidbody body)
     {
       if (Config.ForceObjecToBeNonKinematic && body.isKinematic)
       {
         body.isKinematic = false;
       }
       if (_initialized) return;
-      Initialize(body, camera);
+      Initialize(body);
     }
 
     // Perform any one-time init actions
-    private void Initialize(Rigidbody2D body, Camera camera)
+    private void Initialize(Rigidbody body)
     {
       _initialized = true;
-      _shiftCamera = camera == null ? null : camera.gameObject.GetComponent<InputShiftableCamera>();
-      
       if (Config.Directions != null) return;
       var root = body.gameObject.transform;
       while (root.parent != null)
       {
         root = root.parent;
       }
-      _.Log("Warning: No direction set for GenericMotion; selecting default: {0}", root);
+      Debug.Log("Warning: No direction set for GenericMotion; selecting default: {0}", root);
       Config.Directions = root.gameObject;
     }
   }

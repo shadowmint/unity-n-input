@@ -1,21 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using N.Package.Core;
 using N.Package.Input.Events;
-using N.Package.Input.Motion;
 using UnityEngine;
 
-namespace N.Package.Input.Templates.Platformer
+namespace N.Package.Input.Templates.Isometric
 {
   [System.Serializable]
-  public struct PlatformerCameraItem
+  public struct IsoCameraItem
   {
     public Controller Controller;
     public Actor Actor;
   }
 
-  [RequireComponent(typeof(Camera))]
-  public class PlatformerCamera : MonoBehaviour
+  public class IsoCamera : MonoBehaviour
   {
     public Vector3 Offset;
 
@@ -23,8 +20,7 @@ namespace N.Package.Input.Templates.Platformer
     [Range(0, 5)]
     public float DistanceFactor;
 
-    public List<PlatformerCameraItem> Actors;
-    private InputShiftableCamera _shiftOffset;
+    public List<IsoCameraItem> Actors;
 
     public void Awake()
     {
@@ -47,15 +43,12 @@ namespace N.Package.Input.Templates.Platformer
           Bind(ep.Controller, ep.Actor);
         }
       });
-
-      _shiftOffset = GetComponent<InputShiftableCamera>();
     }
 
     public void Bind(Controller controller, Actor actor)
     {
       Release(actor);
-      actor.Camera = GetComponent<Camera>();
-      Actors.Add(new PlatformerCameraItem()
+      Actors.Add(new IsoCameraItem()
       {
         Controller = controller,
         Actor = actor
@@ -65,21 +58,20 @@ namespace N.Package.Input.Templates.Platformer
 
     public void Release(Actor actor)
     {
-      actor.Camera = null;
       Actors.RemoveAll(i => i.Actor == actor);
     }
 
     private Vector3 AverageActorPosition()
     {
       var sum = Actors.Aggregate(Vector3.zero, (acc, i) => acc + i.Actor.transform.position);
-      return sum / Actors.Count;
+      return sum / (float) Actors.Count;
     }
 
     private float AverageActorPositionDelta()
     {
       var total = Actors.Sum(a1 => Actors.Sum(
         a2 => Vector3.Distance(a1.Actor.transform.position, a2.Actor.transform.position)));
-      return total / (Actors.Count * Actors.Count);
+      return total / (float) (Actors.Count * Actors.Count);
     }
 
     private Vector3 RecalculateOffset()
@@ -91,9 +83,8 @@ namespace N.Package.Input.Templates.Platformer
     {
       if (Actors.Count > 0)
       {
-        var shiftOffset = _shiftOffset == null ? Vector3.zero : _shiftOffset.Offset;
         var offset = Offset + AverageActorPositionDelta() * -1.0f * DistanceFactor * transform.forward;
-        transform.position = AverageActorPosition() + offset + shiftOffset;
+        transform.position = AverageActorPosition() + offset;
       }
     }
   }

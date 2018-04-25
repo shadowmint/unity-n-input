@@ -32,6 +32,9 @@ namespace N.Package.Input.Motion
     [Tooltip("Set to false to allow objects to override kinematic state")]
     public bool ForceObjecToBeNonKinematic = true;
 
+    [Tooltip("You jump as a factor of your speed; but this is the minimum threshold")]
+    public float MinJumpPartial = 0.5f;
+
     public Vector3 Forward(Rigidbody body)
     {
       return BestTransform(body).forward;

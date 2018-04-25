@@ -1,7 +1,5 @@
 ﻿using System.Linq;
-using System.Runtime.Serialization.Formatters;
 using UnityEngine;
-using Random = N.Package.Core.Random;
 
 namespace N.Package.Input.Motion
 {
@@ -23,6 +21,8 @@ namespace N.Package.Input.Motion
 
     private const float MinimumVelocityTheshold = 0.01f;
 
+    private const float CompleteIdleVelocityThreshold = 0.001f;
+
     public void Update(GenericMotionConfig config, Rigidbody body)
     {
       UpdateCurrentState(config, body);
@@ -34,25 +34,32 @@ namespace N.Package.Input.Motion
       var delta = (target - current).normalized * config.Acceleration * fallingAccelerationMultiplier * Time.deltaTime;
       Velocity += delta;
 
+      // Check for ground
+      DetectGround(config, body);
+
       // Convery velocity into force to apply.
-      current = body.velocity - Vector3.Project(body.velocity, config.Up(body));
-      target = Velocity - current;
-      Force = target.magnitude * target.magnitude * target.normalized * body.mass;
+      if (Grounded)
+      {
+        current = body.velocity - Vector3.Project(body.velocity, config.Up(body));
+        target = Velocity - current;
+        Force = target.magnitude * target.magnitude * target.normalized * body.mass;
+      }
 
       // Jumping
-      DetectGround(config, body);
       if (Jumping)
       {
         if (Grounded && !Falling)
         {
           if (_elapsedSinceLastJump > config.MinJumpInterval)
           {
-            Impulse = config.Up(body) * Direction.Jump * config.JumpSpeed * body.mass;
+            var fractionalSpeed = Mathf.Clamp(Mathf.Abs(body.velocity.magnitude / config.MaxSpeed), config.MinJumpPartial, 1.0f);
+            Impulse = config.Up(body) * Direction.Jump * config.JumpSpeed * fractionalSpeed * body.mass;
             Jumping = false;
             _elapsedSinceLastJump = 0f;
           }
         }
       }
+
       _elapsedSinceLastJump += Time.deltaTime;
 
       HaltMinimumVelocities();
@@ -64,10 +71,12 @@ namespace N.Package.Input.Motion
       {
         Velocity.x = 0f;
       }
+
       if (Mathf.Abs(Velocity.y) < MinimumVelocityTheshold)
       {
         Velocity.y = 0f;
       }
+
       if (Mathf.Abs(Velocity.z) < MinimumVelocityTheshold)
       {
         Velocity.z = 0f;
@@ -84,6 +93,7 @@ namespace N.Package.Input.Motion
       {
         Falling = body.velocity.y < config.JumpFallingThreshold;
       }
+
       if (Falling)
       {
         Jumping = false;
@@ -93,9 +103,17 @@ namespace N.Package.Input.Motion
     private void DetectGround(GenericMotionConfig config, Rigidbody body)
     {
       if (!config.EnableGroundDetection) return;
+
+      // If we're completely stopped, we're probably stuck. Mark as grounded.
+      if (Mathf.Abs(body.velocity.magnitude) <= CompleteIdleVelocityThreshold)
+      {
+        Grounded = true;
+        return;
+      }
+      
+      // Otherwise, raycast for target
       var root = config.GroundDetectionPoint != null ? config.GroundDetectionPoint : body.gameObject;
-      var hits = Physics.RaycastAll(root.transform.position, -config.Up(body), config.GroundDetectionDistance,
-        config.GroundCollisionMask);
+      var hits = Physics.RaycastAll(root.transform.position, -config.Up(body), config.GroundDetectionDistance, config.GroundCollisionMask);
       Grounded = hits.Any(i => i.collider.gameObject != body.gameObject);
     }
 

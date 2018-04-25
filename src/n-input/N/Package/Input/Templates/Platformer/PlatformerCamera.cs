@@ -1,19 +1,20 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using N.Package.Core;
 using N.Package.Input.Events;
+using N.Package.Input.Motion;
 using UnityEngine;
 
-namespace N.Package.Input.Templates.Isometric
+namespace N.Package.Input.Templates.Platformer
 {
   [System.Serializable]
-  public struct IsoCameraItem
+  public struct PlatformerCameraItem
   {
     public Controller Controller;
     public Actor Actor;
   }
 
-  public class IsoCamera : MonoBehaviour
+  [RequireComponent(typeof(Camera))]
+  public class PlatformerCamera : MonoBehaviour
   {
     public Vector3 Offset;
 
@@ -21,7 +22,8 @@ namespace N.Package.Input.Templates.Isometric
     [Range(0, 5)]
     public float DistanceFactor;
 
-    public List<IsoCameraItem> Actors;
+    public List<PlatformerCameraItem> Actors;
+    private InputShiftableCamera _shiftOffset;
 
     public void Awake()
     {
@@ -44,12 +46,15 @@ namespace N.Package.Input.Templates.Isometric
           Bind(ep.Controller, ep.Actor);
         }
       });
+
+      _shiftOffset = GetComponent<InputShiftableCamera>();
     }
 
     public void Bind(Controller controller, Actor actor)
     {
       Release(actor);
-      Actors.Add(new IsoCameraItem()
+      actor.Camera = GetComponent<Camera>();
+      Actors.Add(new PlatformerCameraItem()
       {
         Controller = controller,
         Actor = actor
@@ -59,20 +64,21 @@ namespace N.Package.Input.Templates.Isometric
 
     public void Release(Actor actor)
     {
+      actor.Camera = null;
       Actors.RemoveAll(i => i.Actor == actor);
     }
 
     private Vector3 AverageActorPosition()
     {
       var sum = Actors.Aggregate(Vector3.zero, (acc, i) => acc + i.Actor.transform.position);
-      return sum / (float) Actors.Count;
+      return sum / Actors.Count;
     }
 
     private float AverageActorPositionDelta()
     {
       var total = Actors.Sum(a1 => Actors.Sum(
         a2 => Vector3.Distance(a1.Actor.transform.position, a2.Actor.transform.position)));
-      return total / (float) (Actors.Count * Actors.Count);
+      return total / (Actors.Count * Actors.Count);
     }
 
     private Vector3 RecalculateOffset()
@@ -84,8 +90,9 @@ namespace N.Package.Input.Templates.Isometric
     {
       if (Actors.Count > 0)
       {
+        var shiftOffset = _shiftOffset == null ? Vector3.zero : _shiftOffset.Offset;
         var offset = Offset + AverageActorPositionDelta() * -1.0f * DistanceFactor * transform.forward;
-        transform.position = AverageActorPosition() + offset;
+        transform.position = AverageActorPosition() + offset + shiftOffset;
       }
     }
   }
