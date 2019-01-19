@@ -1,6 +1,6 @@
 {
   "name": "unity-n-input",
-  "version": "3.1.0",
+  "version": "3.1.1",
   "description": "Input handling scripts",
   "main": "index.js",
   "repository": {
@@ -22,6 +22,6 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "dependencies": {
-    "unity-n-events": "github:shadowmint/unity-n-events#1.1.5"
+    "unity-n-events": "github:shadowmint/unity-n-events#2.0.0"
   }
 }

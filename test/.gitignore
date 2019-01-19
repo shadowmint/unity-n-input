@@ -41,15 +41,17 @@ Library/LastSceneManagerSetup.txt
 Library/shadercompiler-*
 Library/CurrentLayout.dwlt
 Library/UnityAssemblies
+Library
 .DS_Store
 
 node_modules
 Assets/build
-Assets/packages
-Assets/packages.meta
+Assets/pkg-all
+Assets/pkg-all.meta
 manifest.json
 manifest.json.meta
 .vscode
 Library/CrashedAssetImports.txt
 
 EditorTestResults.xml
+Logs

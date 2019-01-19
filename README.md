@@ -17,21 +17,18 @@ From your unity project folder:
 
     npm init
     npm install shadowmint/unity-n-input --save
-    echo Assets/packages >> .gitignore
-    echo Assets/packages.meta >> .gitignore
+    echo Assets/pkg-all >> .gitignore
+    echo Assets/pkg-all.meta >> .gitignore
 
 The package and all its dependencies will be installed in
-your Assets/packages folder.
+your Assets/pkg-all folder.
 
 ## Development
 
 Setup and run tests:
 
-    npm install
-    npm install ..
     cd test
     npm install
-    gulp
 
 Remember that changes made to the test folder are not saved to the package
 unless they are copied back into the source folder.
@@ -44,4 +41,4 @@ All tests are wrapped in `#if ...` blocks to prevent test spam.
 
 You can enable tests in: Player settings > Other Settings > Scripting Define Symbols
 
-The test key for this package is: N_INPUT_TESTS
+The test key for this package is: `N_INPUT_TESTS`
