@@ -35,6 +35,7 @@ namespace N.Package.Input
             if (Actor != null)
             {
                 Actor.OnInputReady(true);
+                Device.Actor = Actor;
             }
         }
 
@@ -59,6 +60,11 @@ namespace N.Package.Input
             if (Actor == null) return;
             Actor.OnControllerDisconnected();
             Actor = null;
+            
+            if (Device != null)
+            {
+                Device.Actor = null;
+            }
         }
 
         private void DisconnectDevice()

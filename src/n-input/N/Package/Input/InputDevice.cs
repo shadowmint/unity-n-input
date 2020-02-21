@@ -1,4 +1,5 @@
 using System;
+using N.Package.Input.Infrastructure;
 using UnityEngine;
 
 namespace N.Package.Input
@@ -14,5 +15,10 @@ namespace N.Package.Input
         /// Return a typed state object or null.
         /// </summary>
         public abstract TState GetState<TState>() where TState : class;
+
+        /// <summary>
+        /// The actor
+        /// </summary>
+        public InputInternalActorType Actor { get; set; }
     }
 }
