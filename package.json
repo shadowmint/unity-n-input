@@ -22,6 +22,5 @@
     "postinstall": "node scripts/postinstall.js"
   },
   "dependencies": {
-    "unity-n-events": "github:shadowmint/unity-n-events#2.0.0"
   }
 }

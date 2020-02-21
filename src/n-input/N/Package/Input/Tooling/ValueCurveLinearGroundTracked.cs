@@ -26,6 +26,8 @@ namespace N.Package.Input.Tooling
         
         protected override float Next(float step)
         {
+            if (groundTracker == null) return value;
+            
             // Use energy
             if (!groundTracker.state.grounded)
             {
