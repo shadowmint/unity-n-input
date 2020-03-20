@@ -1,11 +1,10 @@
-using N.Package.Input.Example.Infrastructure;
 using N.Package.Input.Tooling;
 using UnityEngine;
 
 namespace N.Package.Input.Example
 {
     [System.Serializable]
-    public class InputExampleMovement
+    public class ExamplePlayerInputMovement
     {
         [Tooltip("Face direction if moving this fast in this direction")]
         public float changeDirectionThreshold = 1f;
@@ -19,7 +18,7 @@ namespace N.Package.Input.Example
         private Rigidbody _body;
         private InputGroundTracker _groundTracker;
 
-        public void UpdateFromInput(InputExamplePlayerInput state, Transform player)
+        public void UpdateFromInput(ExamplePlayerInputState state, Transform player)
         {
             if (_body == null)
             {
@@ -56,9 +55,9 @@ namespace N.Package.Input.Example
 
             // Update state
             var t = player;
-            x.Update(state.x);
-            z.Update(state.z);
-            y.Update(state.y);
+            x.Update(state.move.x);
+            z.Update(state.move.z);
+            y.Update(state.move.y);
 
             // Calculate new desired velocity
             var forward = Vector3.ProjectOnPlane(referenceObject.transform.forward, Vector3.up);
