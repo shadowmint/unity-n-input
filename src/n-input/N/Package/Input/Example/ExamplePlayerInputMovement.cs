@@ -56,8 +56,8 @@ namespace N.Package.Input.Example
             // Update state
             var t = player;
             x.Update(state.move.x);
-            z.Update(state.move.z);
-            y.Update(state.move.y);
+            z.Update(state.move.y);
+            y.Update(state.jump ? 1f : 0f);
 
             // Calculate new desired velocity
             var forward = Vector3.ProjectOnPlane(referenceObject.transform.forward, Vector3.up);

@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace N.Package.Input.Tooling
@@ -9,6 +10,8 @@ namespace N.Package.Input.Tooling
     public class ValueCurveLinearGroundTracked : ValueCurve
     {
         public InputGroundTracker groundTracker;
+
+        public float threshold = 0.1f;
         
         public float acceleration;
         
@@ -50,13 +53,22 @@ namespace N.Package.Input.Tooling
                 }
             }
 
-            delta = dampening * Time.deltaTime;
-            if (delta > Mathf.Abs(value))
+            if (Mathf.Abs(value) > threshold)
             {
-                delta = value;
+                delta = dampening * Time.deltaTime;
+                if (delta > Mathf.Abs(value))
+                {
+                    delta = value;
+                }
             }
             
-            return value - Mathf.Sign(value) * delta;
+            var next =  value - Mathf.Sign(value) * delta;
+            if (Mathf.Abs(next) < threshold)
+            {
+                next = 0f;
+            }
+
+            return next;
         }
     }
 }

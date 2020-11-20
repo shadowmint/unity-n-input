@@ -23,7 +23,7 @@ namespace N.Package.Input.Tooling
         public void OnTriggerEnter(Collider other)
         {
             if (!active) return;
-            if ((other.gameObject.layer & layerMask) == 0) return;
+            if ((other.gameObject.layer & layerMask) != other.gameObject.layer) return;
             if (other.isTrigger) return;
             if (connectedObjects.Contains(other.gameObject)) return;
             connectedObjects.Add(other.gameObject);
@@ -56,6 +56,18 @@ namespace N.Package.Input.Tooling
             if (!connectedObjects.Contains(other.gameObject)) return;
             connectedObjects.Remove(other.gameObject);
             connected = connectedObjects.Count;
+        }
+
+        /// <summary>
+        /// Explicitly remove a tracked object; eg. if it is changed into a trigger.
+        /// </summary>
+        public void ExplicitRemove(GameObject externalObject)
+        {
+            if (connectedObjects.Contains(externalObject))
+            {
+                connectedObjects.Remove(externalObject);
+                connected = connectedObjects.Count;
+            }
         }
     }
 }

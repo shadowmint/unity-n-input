@@ -10,10 +10,6 @@ namespace N.Package.Input.Tooling
 
         public InputGroundTrackerState state;
 
-        private RaycastHit[] _raycastHits;
-
-        private RaycastHit2D[] _raycastHits2D;
-
         public void Start()
         {
             foreach (var layerName in config.layerNames)
@@ -53,31 +49,14 @@ namespace N.Package.Input.Tooling
 
         private void Update2D()
         {
-            if (_raycastHits2D == null)
-            {
-                _raycastHits2D = new RaycastHit2D[1];
-            }
-
             var grounded = false;
-            foreach (var source in config.queryPoints)
-            {
-                var matches = Physics2D.RaycastNonAlloc(source.transform.position, Down2, _raycastHits2D, config.queryDistance, state.layerMask);
-                if (matches > 0)
-                {
-                    grounded = true;
-                    break;
-                }
-            }
-
             foreach (var volume in config.queryVolumes)
             {
-                if (volume.connected > 0)
-                {
-                    grounded = true;
-                    break;
-                }
+                if (volume.connected <= 0) continue;
+                grounded = true;
+                break;
             }
-            
+
             if (grounded)
             {
                 state.timeSinceLastGrounded = 0;
@@ -92,30 +71,12 @@ namespace N.Package.Input.Tooling
 
         private void Update3D()
         {
-            if (_raycastHits == null)
-            {
-                _raycastHits = new RaycastHit[1];
-            }
-
             var grounded = false;
-            foreach (var source in config.queryPoints)
-            {
-                var ray = new Ray(source.transform.position, Down3);
-                var matches = Physics.RaycastNonAlloc(ray, _raycastHits, config.queryDistance, state.layerMask);
-                if (matches > 0)
-                {
-                    grounded = true;
-                    break;
-                }
-            }
-
             foreach (var volume in config.queryVolumes)
             {
-                if (volume.connected > 0)
-                {
-                    grounded = true;
-                    break;
-                }
+                if (volume.connected <= 0) continue;
+                grounded = true;
+                break;
             }
 
             if (grounded)
@@ -130,32 +91,6 @@ namespace N.Package.Input.Tooling
             }
         }
 
-        private Vector2 Down2
-        {
-            get
-            {
-                if (config.directionReference == null)
-                {
-                    return Vector2.down;
-                }
-
-                return -config.directionReference.transform.up;
-            }
-        }
-
-        private Vector3 Down3
-        {
-            get
-            {
-                if (config.directionReference == null)
-                {
-                    return Vector3.down;
-                }
-
-                return -config.directionReference.transform.up;
-            }
-        }
-
         public enum InputGroundTrackerMode
         {
             Track3D,
@@ -165,7 +100,8 @@ namespace N.Package.Input.Tooling
         [System.Serializable]
         public class InputGroundTrackerState
         {
-            [Tooltip("Read-only; use layerName;")] public int layerMask = -5;
+            [Tooltip("Read-only; use layerName;")] 
+            public int layerMask = -5;
 
             public float timeSinceLastGrounded;
 
@@ -175,18 +111,10 @@ namespace N.Package.Input.Tooling
         [System.Serializable]
         public class InputGroundTrackerConfig
         {
-            [Tooltip("Use this object for the axis to find 'down'; or Vector3 if null")]
-            public GameObject directionReference;
-
-            [Tooltip("Raycast query points to find the ground")]
-            public List<GameObject> queryPoints;
-
             [Tooltip("Collision volumes to find the ground with")]
             public List<InputGroundTrackerVolume> queryVolumes;
-            
-            public InputGroundTrackerMode trackerMode;
 
-            public float queryDistance = 0.5f;
+            public InputGroundTrackerMode trackerMode;
 
             [Tooltip("Automatically look up named layers instead of using a mask by putting the names here")]
             public List<string> layerNames;

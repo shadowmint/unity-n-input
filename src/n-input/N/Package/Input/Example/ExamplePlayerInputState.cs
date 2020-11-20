@@ -7,5 +7,6 @@ namespace N.Package.Input.Example
     {
         public Vector3 move;
         public Vector3 look;
+        public bool jump;
     }
 }

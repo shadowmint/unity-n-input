@@ -31,5 +31,17 @@ namespace N.Package.Input.Example
             var value = context.ReadValue<Vector2>();
             state.look = value;
         }
+        
+        public void OnJump(InputAction.CallbackContext context)
+        {
+            if (context.phase == InputActionPhase.Started)
+            {
+                state.jump = true;
+            }
+            else if (context.phase == InputActionPhase.Canceled)
+            {
+                state.jump = false;
+            }
+        }
     }
 }
