@@ -1,15 +1,6 @@
 # n-input
 
-Low level input semantics & high level controller helpers.
-
-Typically prefer to use a high level controller rather than the low
-level scripts.
-
-## Usage
-
-See the tests in the `Editor/` folder for each class for usage examples.
-
-A number of demos are also included.
+Helpers for using the input system.
 
 ## Install
 
