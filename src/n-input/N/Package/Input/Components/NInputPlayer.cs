@@ -16,7 +16,7 @@ namespace N.Package.Input.Components
 
         public TActor actor;
 
-        public void Start()
+        public void Awake()
         {
             var globalState = FindObjectOfType<NInputPlayers>();
             if (globalState == null)
