@@ -15,9 +15,19 @@ namespace N.Package.Input.Components
         public TState state;
 
         public TActor actor;
+        
+        private bool _initialized;
 
-        public void Awake()
+        public void Start()
         {
+            Initialize();
+        }
+
+        public void Initialize()
+        {
+            if (_initialized) return;
+            _initialized = true;
+            
             var globalState = FindObjectOfType<NInputPlayers>();
             if (globalState == null)
             {

@@ -5,8 +5,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "unity-n-input": "file:..",
+    "unity-n-input": "file:../unity-n-input-5.2.0.tgz",
     "unity-n-tests": "github:shadowmint/unity-n-tests"
-  },
-  "devDependencies": {}
+  }
 }

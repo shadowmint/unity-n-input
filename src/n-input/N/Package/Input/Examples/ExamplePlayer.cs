@@ -14,6 +14,7 @@ public class ExamplePlayer : NInputPlayer<ExamplePlayer.State, ExampleActor>
     public override void OnSpawned(int playerIndex, ExampleActor actor)
     {
         actor.state = state;
+        Initialize();
     }
 
     public override ExampleActor OnSelectActor(NInputPlayers playerList, int playerIndex)
