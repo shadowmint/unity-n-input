@@ -1,13 +1,10 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
-using UnityEngine.InputSystem.LowLevel;
-using UnityEngine.InputSystem.Users;
 
 namespace N.Package.Input.Components
 {
     /// <summary>
-    /// Add one of these per player.
+    ///     Add one of these per player.
     /// </summary>
     [RequireComponent(typeof(PlayerInput))]
     public abstract class NInputPlayer<TState, TActor> : MonoBehaviour where TActor : MonoBehaviour
@@ -15,7 +12,7 @@ namespace N.Package.Input.Components
         public TState state;
 
         public TActor actor;
-        
+
         private bool _initialized;
 
         public void Start()
@@ -27,8 +24,8 @@ namespace N.Package.Input.Components
         {
             if (_initialized) return;
             _initialized = true;
-            
-            var globalState = FindObjectOfType<NInputPlayers>();
+
+            var globalState = FindFirstObjectByType<NInputPlayers>();
             if (globalState == null)
             {
                 Debug.LogWarning("No NInputPlayers on scene; NInputPlayer is disabled");
@@ -40,7 +37,7 @@ namespace N.Package.Input.Components
         }
 
         public abstract TActor OnSelectActor(NInputPlayers playerList, int playerIndex);
-        
+
         public abstract void OnSpawned(int playerIndex, TActor actor);
     }
 }
